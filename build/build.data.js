@@ -1,7 +1,9 @@
 ﻿//build 配置文件
 module.exports = {
     root: "../",
-    
+
+    noStore: true,
+
     concat: {
         title: "文件合并",
 
@@ -9,15 +11,15 @@ module.exports = {
 
         list: [
             {
-                src: [ "Q.UI.Box.js", "Q.UI.ContextMenu.js", "Q.UI.DropdownList.js"/*, "Q.UI.ColorPicker.js", "Q.UI.Progressbar.js"*/ ],
-                dest: "Q.UI.js"
+                src: ["Q.UI.Box.js", "Q.UI.ContextMenu.js", "Q.UI.DropdownList.js"/*, "Q.UI.ColorPicker.js", "Q.UI.Progressbar.js"*/],
+                dest: "/Q.UI.js"
             },
             {
-                src: [ "adapter/jquery.js", "/Q.UI.js" ],
-                dest: "jquery.QUI.js"
+                src: ["adapter/jquery.js", "/Q.UI.js"],
+                dest: "/jquery.QUI.js"
             }
         ],
-        
+
         replace: [
             //移除\r字符
             [/\r/g, ""],
@@ -33,9 +35,8 @@ module.exports = {
             //cmd: "java -jar D:\\tools\\compiler.jar --js=%f.fullname% --js_output_file=%f.dest%",
             cmd: "uglifyjs %f.fullname% -o %f.dest% -c -m",
 
-            dir: ["","src","src/**"],
-            output:"dist",
-            match: "*.js",
+            output: "dist",
+            match: ["*.js", "src/**.js"],
 
             replace: [
                 //去掉文件头部压缩工具可能保留的注释
@@ -52,6 +53,6 @@ module.exports = {
             ]
         }
     ],
-    
+
     run: ["concat", "cmd"]
 };
