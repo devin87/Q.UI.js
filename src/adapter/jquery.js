@@ -1,5 +1,5 @@
-﻿/// <reference path="../lib/Q.mini.js" />
-/// <reference path="../lib/jquery-1.11.3.js" />
+﻿/// <reference path="../../lib/jquery-1.11.3.js" />
+/// <reference path="../../lib/Q.mini.js" />
 /*
 * Q.UI.adapter.jquery.js
 * author:devin87@qq.com  
@@ -9,6 +9,10 @@
     "use strict";
 
     var window = Q.G,
+
+        isFunc = Q.isFunc,
+        isObject = Q.isObject,
+        isArrayLike = Q.isArrayLike,
 
         extend = Q.extend,
         async = Q.async,
@@ -130,17 +134,6 @@
 
     //---------------------- event.js ----------------------
 
-    function add_events(elements, types, selector, handle, once) {
-        var $els = $(elements);
-        $els.on(types, selector, handle, once);
-
-        return {
-            off: function (types, selector) {
-                $els.off(types, selector);
-            }
-        };
-    }
-
     function stop_event(event, isPreventDefault, isStopPropagation) {
         var e = new jQuery.Event(event);
         if (isPreventDefault !== false) e.preventDefault();
@@ -151,6 +144,91 @@
         stop_event(this);
     };
 
+    var SUPPORT_W3C_EVENT = !!document.addEventListener;
+
+    //添加DOM事件,未做任何封装
+    function addEvent(ele, type, fn) {
+        if (SUPPORT_W3C_EVENT) ele.addEventListener(type, fn, false);
+        else ele.attachEvent("on" + type, fn);  //注意:fn的this并不指向ele
+    }
+
+    //移除DOM事件
+    function removeEvent(ele, type, fn) {
+        if (SUPPORT_W3C_EVENT) ele.removeEventListener(type, fn, false);
+        else ele.detachEvent("on" + type, fn);
+    }
+
+    //添加事件
+    function add_event(ele, type, selector, fn, once, stops) {
+        var handle = fn;
+
+        if (once) {
+            handle = function (e) {
+                fn.call(this, e);
+
+                $(ele).off(type, selector, handle);
+            };
+        }
+
+        $(ele).on(type, selector, handle);
+
+        if (!once) stops.push([ele, type, handle, selector]);
+    }
+
+    //批量添加事件
+    //types:事件类型,多个之间用空格分开;可以为对象
+    //selector:要代理的事件选择器或处理句柄
+    function add_events(elements, types, selector, handle, once) {
+        if (typeof types == "string") {
+            types = types.split(' ');
+
+            if (isFunc(selector)) {
+                once = once || handle;
+                handle = selector;
+                selector = undefined;
+            }
+        } else {
+            if (selector === true || handle === true) once = true;
+            if (selector === true) selector = undefined;
+        }
+
+        var stops = [];
+
+        makeArray(elements).forEach(function (ele) {
+            if (isArrayLike(types)) {
+                makeArray(types).forEach(function (type) {
+                    add_event(ele, type, selector, handle, once, stops);
+                });
+            } else if (isObject(types)) {
+                Object.forEach(types, function (type, handle) {
+                    add_event(ele, type, selector, handle, once, stops);
+                });
+            }
+        });
+
+        //返回移除事件api
+        return {
+            es: stops,
+
+            off: function (types, selector) {
+                remove_events(stops, types, selector);
+            }
+        };
+    }
+
+    //批量移除事件
+    //es:事件句柄对象列表  eg:es => [[ele, type, handle, selector],...]
+    function remove_events(es, types, selector) {
+        es.forEach(function (s) {
+            $(s[0]).off(s[1], s[3], s[2]);
+        });
+    }
+
+    //批量添加事件,执行一次后取消
+    function add_events_one(elements, types, selector, handle) {
+        return add_events(elements, types, selector, handler, true);
+    }
+
     Q.event = {
         fix: function (e) {
             return new jQuery.Event(e);
@@ -160,7 +238,17 @@
             $(el).trigger(type);
         },
 
-        add: add_events
+        //原生事件添加(建议使用add)
+        addEvent: addEvent,
+        //原生事件移除
+        removeEvent: removeEvent,
+
+        //添加事件,并返回操作api
+        add: add_events,
+
+        //注意:批量移除事件,与一般事件移除不同;移除事件请使用add返回的api
+        removeEs: remove_events,
+        one: add_events_one
     };
 
     //---------------------- dom.js ----------------------

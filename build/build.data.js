@@ -15,7 +15,7 @@ module.exports = {
                 dest: "/Q.UI.js"
             },
             {
-                src: ["adapter/jquery.js", "/Q.UI.js"],
+                src: ["/lib/Q.mini.js", "adapter/jquery.js", "/Q.UI.js"],
                 dest: "/jquery.QUI.js"
             }
         ],
@@ -36,7 +36,7 @@ module.exports = {
             cmd: "uglifyjs %f.fullname% -o %f.dest% -c -m",
 
             output: "dist",
-            match: ["*.js", "src/**.js"],
+            match: ["lib/*.js", "*.js", "src/**.js"],
 
             replace: [
                 //去掉文件头部压缩工具可能保留的注释
@@ -47,7 +47,8 @@ module.exports = {
             before: [
                 {
                     "def": "//devin87@qq.com\n",
-                    "Q.js": "//Q.js devin87@qq.com\n//mojoQuery&mojoFx scott.cgi\n"
+                    "Q.js": "//Q.js devin87@qq.com\n//mojoQuery&mojoFx scott.cgi\n",
+                    "jquery-1.11.3.js": "/*! jQuery v1.11.3 | (c) 2005, 2015 jQuery Foundation, Inc. | jquery.org/license */\n"
                 },
                 "//build:%NOW%\n"
             ]
