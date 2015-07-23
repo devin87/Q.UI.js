@@ -12,6 +12,7 @@
 
         isObject = Q.isObject,
         isFunc = Q.isFunc,
+        isUNum = Q.isUNum,
         isUInt = Q.isUInt,
 
         def = Q.def,
@@ -576,10 +577,10 @@
                 boxMain = getNext(boxHead);
 
             //兼容性考虑,width最好指定固定值
-            if (isUInt(width)) setWidth(box, width);
+            if (isUNum(width)) setWidth(box, width);
 
             if (maxHeight) {
-                if (isUInt(height) && height > maxHeight) height = maxHeight;
+                if (isUNum(height) && height > maxHeight) height = maxHeight;
 
                 if (box.offsetHeight > maxHeight) {
                     height = maxHeight;
@@ -588,7 +589,7 @@
                 }
             }
 
-            if (isUInt(height)) {
+            if (isUNum(height)) {
                 if (height > 50) setHeight(boxMain, height - boxHead.offsetHeight - 20);
             }
 
@@ -650,7 +651,7 @@
                 '<div class="fl x-ico">' +
                     (ops.iconHtml || '<img alt="" src="' + ops.icon + '"/>') +
                 '</div>' +
-                '<div class="fl x-dialog"' + (isUInt(width) ? ' style="width:' + (width - 60) + 'px;"' : '') + '>' + ops.html + '</div>' +
+                '<div class="fl x-dialog"' + (isUNum(width) ? ' style="width:' + (width - 60) + 'px;"' : '') + '>' + ops.html + '</div>' +
                 '<div class="clear"></div>';
 
             ops.html = html;
@@ -689,8 +690,8 @@
     }
 
     var dialog = {
-        //自定义弹出框
-        createDialogBox: createDialogBox,
+        //创建自定义弹出框
+        create: createDialogBox,
 
         //提示框
         alert: function (msg, fn, ops) {
