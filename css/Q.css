@@ -1,6 +1,6 @@
 ﻿/*=============全局样式================*/
 body, dl, dt, dd, p, table, form, nav, ul, ol, input, select { margin: 0; padding: 0; }
-body { color: #333; font: 14px/1.6 Verdana,Arial,"微软雅黑"; }
+body { color: #333; font: 14px/1.6 Verdana,"微软雅黑",Tahoma; }
 h1, h2, h3, h4, h5, h6 { font-size: 100%; margin: 0; padding: 0; font-weight: normal; }
 ol, ul { list-style: none; }
 input, select { outline: none; }
@@ -125,15 +125,15 @@ a.text { cursor: text; }
 /* --------------- 颜色选择器 --------------- */
 .x-picker { position: absolute; width: 231px; border-style: solid; border-color: #000; border-width: 1px 0 0 1px; font-size: 12px; font-family: "宋体", Arial; z-index: 999; }
 .x-picker .xp-title { height: 25px; padding-top: 4px; background: #E4E4E4; border-style: solid; border-color: #000; border-width: 0 1px 1px 0; }
-.x-picker .xp-preview { float: left; width: 50px; height: 20px; border: 1px solid #333; background: #FFF; margin-left: 5px; display:inline;}
+.x-picker .xp-preview { float: left; width: 50px; height: 20px; border: 1px solid #333; background: #FFF; margin-left: 5px; display: inline; }
 .x-picker .xp-val { float: left; width: 80px; text-align: center; line-height: 20px; }
-.x-picker .xp-type { float: right; margin-right: 6px; display:inline;}
+.x-picker .xp-type { float: right; margin-right: 6px; display: inline; }
 .x-picker .xp-table table { table-layout: fixed; width: 0; height: 132px; border-collapse: collapse; cursor: default; }
 .x-picker .xp-table td { width: 10px; height: 10px; padding: 0; border-style: solid; border-color: #000; border-width: 0 1px 1px 0; }
 
 /* --------------- 分页按钮 --------------- */
 .pager { text-align: center; margin-top: 15px; }
-.pager li { display: inline-block; *display: inline; *zoom: 1; cursor: pointer; background-color: #a4a4a4; color: #fff; margin-right: 5px; /*line-height: 20px;*/ }
+.pager li { display: inline-block; *display: inline; *zoom: 1; cursor: pointer; background-color: #a4a4a4; color: #fff; margin-right: 5px; line-height: 17px; font-family: 微软雅黑; }
 /*.pager li:hover { background-color: #5ac7f1; }*/
 .pager li, .pager .pager-link a { padding: 4px 8px; /*min-width: 16px;*/ }
 .pager li:hover, .pager li.on { background-color: #06A4E1; }
