@@ -2,7 +2,7 @@
 /*
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * author:devin87@qq.com
-* update:2015/07/15 11:46
+* update:2015/08/18 14:24
 */
 (function (undefined) {
     "use strict";
@@ -691,7 +691,7 @@
 
     var dialog = {
         //创建自定义弹出框
-        create: createDialogBox,
+        createDialogBox: createDialogBox,
 
         //提示框
         alert: function (msg, fn, ops) {

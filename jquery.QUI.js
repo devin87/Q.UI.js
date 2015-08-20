@@ -2,7 +2,7 @@
 ﻿/*
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
 * author:devin87@qq.com  
-* update:2015/07/23 11:09
+* update:2015/08/12 18:04
 */
 (function (undefined) {
     "use strict";
@@ -175,6 +175,38 @@
         return [obj];
     }
 
+    //按条件产生数组 arr(5,2,2) => [2,4,6,8,10]
+    //eg:按1-10项产生斐波那契数列 =>arr(10, function (value, i, list) { return i > 1 ? list[i - 1] + list[i - 2] : 1; })
+    //length:数组长度
+    //value:数组项的初始值
+    //step:第增值或处理函数(当前值,索引,当前产生的数组)
+    function arr(length, value, step) {
+        if (isFunc(value)) {
+            step = value;
+            value = 0;
+        }
+        if (value == undefined) value = 0;
+        if (step == undefined) step = 1;
+
+        var list = [], i = 0;
+
+        if (isFunc(step)) {
+            while (i < length) {
+                value = step(value, i, list);
+                list.push(value);
+                i++;
+            }
+        } else {
+            while (i < length) {
+                list.push(value);
+                value += step;
+                i++;
+            }
+        }
+
+        return list;
+    }
+
     //prototype 别名 eg:alias(Array,"forEach","each");
     function alias(obj, name, aliasName) {
         if (!obj || !obj.prototype) return;
@@ -284,7 +316,8 @@
         if (fn == undefined) return;
 
         return setTimeout(function () {
-            fn.apply(bind, args);
+            //ie6-7,apply第二个参数不能为空,否则报错
+            fn.apply(bind, args || []);
         }, def(time, 20));
     }
 
@@ -1023,6 +1056,8 @@
         toArray: toArray,
         makeArray: makeArray,
 
+        arr: arr,
+
         alias: alias,
         extend: extend,
 
@@ -1062,7 +1097,7 @@
 ﻿/*
 * Q.Queue.js 队列
 * author:devin87@qq.com
-* update:2015/06/11 09:50
+* update:2015/08/13 10:45
 */
 (function (undefined) {
     "use strict";
@@ -1085,7 +1120,10 @@
     var QUEUE_TASK_TIMEDOUT = -1,    //任务已超时
         QUEUE_TASK_READY = 0,        //任务已就绪，准备执行
         QUEUE_TASK_PROCESSING = 1,   //任务执行中
-        QUEUE_TASK_OK = 2;           //任务已完成
+        QUEUE_TASK_OK = 2,           //任务已完成
+
+        //自定义事件
+        LIST_CUSTOM_EVENT = ["add", "start", "end", "stop", "complete"];
 
     //异步队列
     function Queue(ops) {
@@ -1095,7 +1133,7 @@
             tasks = ops.tasks;
 
         //队列自定义事件
-        self._listener = new Listener(["add", "start", "end", "complete"], self);
+        self._listener = new Listener(LIST_CUSTOM_EVENT, self);
 
         self.auto = ops.auto !== false;
         self.workerThread = ops.workerThread || 1;
@@ -1103,7 +1141,10 @@
 
         if (ops.rtype == "auto") self.rtype = getType(tasks);
 
-        self.on("complete", ops.complete);
+        LIST_CUSTOM_EVENT.forEach(function (type) {
+            var fn = ops[type];
+            if (fn) self.on(type, fn);
+        });
 
         if (ops.inject) self.inject = ops.inject;
         if (ops.process) self.process = ops.process;
@@ -1232,7 +1273,7 @@
             var self = this;
             self.stoped = true;
 
-            if (isUInt(time)) delay(self._run, self, time);
+            if (isUInt(time)) delay(self.start, self, time);
 
             return self;
         },
@@ -1256,10 +1297,11 @@
 
             //注入回调函数
             var inject = function (result) {
+                //注入结果仅取第一个返回值,有多个结果的请使用数组或对象传递
                 task.result = result;
 
                 //执行原回调函数(如果有)
-                if (isFunc(originalCallback)) originalCallback.apply(this, [].concat(result));
+                if (isFunc(originalCallback)) originalCallback.apply(this, arguments);
 
                 //触发任务完成回调,并执行下一个任务 
                 callback();
@@ -1313,8 +1355,8 @@
         },
 
         //所有任务是否已完成
-        isCompleted: function () {
-            return this.tasks.every(function (task) {
+        isCompleted: function (tasks) {
+            return (tasks || this.tasks).every(function (task) {
                 return task.state == QUEUE_TASK_OK || task.state == QUEUE_TASK_TIMEDOUT;
             });
         },
@@ -1328,17 +1370,22 @@
 
             if (task._timer) clearTimeout(task._timer);
 
-            task.state = state;
+            if (state != undefined) task.state = state;
 
             //触发任务完成事件
             self.trigger("end", task);
 
-            //当前队列任务已完成
-            if (self.isCompleted()) {
-                self.trigger("complete", self.processResult(self.tasks));
+            if (self.stoped) {
+                //任务已停止且完成时触发任务停止事件
+                if (self.isCompleted(self.tasks.slice(0, self.index))) self.trigger("stop", self.processResult(self.tasks));
+            } else {
+                //当前队列任务已完成
+                if (self.isCompleted()) {
+                    self.trigger("complete", self.processResult(self.tasks));
 
-                //队列完成事件,此为提供注入接口
-                fire(self.complete, self);
+                    //队列完成事件,此为提供注入接口
+                    fire(self.complete, self);
+                }
             }
 
             return self._run();
@@ -2589,7 +2636,7 @@
 ﻿/*
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * author:devin87@qq.com
-* update:2015/07/15 11:46
+* update:2015/08/18 14:24
 */
 (function (undefined) {
     "use strict";
@@ -3278,7 +3325,7 @@
 
     var dialog = {
         //创建自定义弹出框
-        create: createDialogBox,
+        createDialogBox: createDialogBox,
 
         //提示框
         alert: function (msg, fn, ops) {
