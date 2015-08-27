@@ -1,6 +1,7 @@
 ﻿/// <reference path="../lib/Q.js" />
 /*
 * Q.UI.ContextMenu.js 多级上下文菜单(右键菜单)
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/07/15 12:07
 */

@@ -1,6 +1,7 @@
 //Q.mini.js (Q.js、Q.Queue.js、Q.core.js、Q.setTimer.js) for jquery 等库
 ﻿/*
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
+* https://github.com/devin87/Q.js
 * author:devin87@qq.com  
 * update:2015/08/12 18:04
 */
@@ -2635,6 +2636,7 @@
 
 ﻿/*
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/08/18 14:24
 */
@@ -3425,6 +3427,7 @@
 
 ﻿/*
 * Q.UI.ContextMenu.js 多级上下文菜单(右键菜单)
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/07/15 12:07
 */
@@ -3881,6 +3884,7 @@
 
 ﻿/*
 * Q.UI.DropdownList.js 下拉列表
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/07/15 12:07
 */

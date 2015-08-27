@@ -1,6 +1,7 @@
 ﻿/// <reference path="../lib/Q.js" />
 /*
 * Q.UI.ColorPicker.js 颜色选择器
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/07/15 12:07
 */

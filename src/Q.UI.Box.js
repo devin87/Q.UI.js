@@ -1,6 +1,7 @@
 ﻿/// <reference path="../lib/Q.js" />
 /*
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/08/18 14:24
 */

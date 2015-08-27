@@ -1,5 +1,6 @@
 ﻿/*
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/08/18 14:24
 */
@@ -790,6 +791,7 @@
 
 ﻿/*
 * Q.UI.ContextMenu.js 多级上下文菜单(右键菜单)
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/07/15 12:07
 */
@@ -1246,6 +1248,7 @@
 
 ﻿/*
 * Q.UI.DropdownList.js 下拉列表
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/07/15 12:07
 */

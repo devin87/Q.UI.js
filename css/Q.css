@@ -141,3 +141,5 @@ a.text { cursor: text; }
 .pager .pager-link li { padding: 0; }
 .pager .pager-link a { display: block; }
 .pager .count, .pager-count { margin-left: 15px; line-height: 24px; }
+.pager .page-size { font-weight: bold; color: red; }
+.pager .total-count { font-weight: bold; color: green; }

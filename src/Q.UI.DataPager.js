@@ -1,8 +1,9 @@
 ﻿/// <reference path="../lib/Q.js" />
 /*
 * Q.UI.DataPager.js 数据分页
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/08/20 17:05
+* update:2015/08/27 15:09
 */
 (function (undefined) {
     "use strict";
@@ -207,7 +208,7 @@
                 '</div>' +
                 (ops.showSize !== false ?
                 '<div class="inline-block pager-count">' +
-                    draw_size(self, '每页<span class="bold hot">' + pageSize + '</span>条', '共<span class="bold green">' + totalCount + '</span>条数据') +
+                    draw_size(self, '每页<span class="page-size">' + pageSize + '</span>条', '共<span class="total-count">' + totalCount + '</span>条数据') +
                 '</div>' : '');
 
             $(boxNav).html(html);

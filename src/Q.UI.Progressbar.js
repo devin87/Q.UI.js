@@ -1,6 +1,7 @@
 ﻿/// <reference path="../lib/Q.js" />
 /*
 * Q.UI.Progressbar.js 进度条
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/07/15 11:46
 */

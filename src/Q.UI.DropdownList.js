@@ -1,6 +1,7 @@
 ﻿/// <reference path="../lib/Q.js" />
 /*
 * Q.UI.DropdownList.js 下拉列表
+* https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
 * update:2015/07/15 12:07
 */
