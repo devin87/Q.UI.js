@@ -3,7 +3,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/08/18 14:24
+* update:2015/09/18 17:09
 */
 (function (undefined) {
     "use strict";
@@ -223,7 +223,7 @@
             if (ops.center) {
                 setCenter(ele);
 
-                E.add(win, "resize", function () {
+                self._api_resize = E.add(win, "resize", function () {
                     setCenter(ele);
                 });
             }
@@ -301,6 +301,8 @@
 
             self._up = mouseup;
             self._api = E.add(target, "mousedown", mousedown);
+
+            return self;
         },
 
         //绑定事件
@@ -319,9 +321,12 @@
 
         //暂停拖动
         pause: function (flag) {
-            this._pause = flag;
+            var self = this;
 
-            this._up && this._up();
+            self._pause = flag;
+            self._up && self._up();
+
+            return self;
         },
         //停止拖动
         stop: function () {
@@ -334,6 +339,21 @@
                 api.off();
                 self._api = null;
             }
+
+            return self;
+        },
+
+        destroy: function () {
+            var self = this,
+                api_resize = self._api_resize;
+
+            self.stop();
+            if (api_resize) {
+                api_resize.off();
+                self._api_resize = null;
+            }
+
+            return self;
         }
     });
 
@@ -451,6 +471,8 @@
 
     //接口,构造器:Box对象
     function Box(init) {
+        this._es = [];
+
         fire(init, this);
     }
 
@@ -477,7 +499,13 @@
 
             return fn;
         },
-        //添加事件
+
+        //绑定事件,同 Event.add,不过会缓存事件句柄,用于统一销毁
+        bind: function () {
+            this._es.push(E.add.apply(E, arguments));
+            return this;
+        },
+        //将事件绑定到查找到的元素上,并非事件代理
         on: function (pattern, types, fn, data) {
             var self = this,
                 list = self.find(pattern);
@@ -486,10 +514,10 @@
                 data = fn;
 
                 Object.forEach(types, function (type, fn) {
-                    E.add(list, type, self.getEventCallback(fn, data));
+                    self.bind(list, type, self.getEventCallback(fn, data));
                 });
             } else {
-                E.add(list, types, self.getEventCallback(fn, data));
+                self.bind(list, types, self.getEventCallback(fn, data));
             }
 
             return self;
@@ -526,15 +554,27 @@
             if (!self.box) return;
 
             removeEle(self.box);
+
+            //遮罩层
             if (self.mbox) self.mbox.remove();
 
-            self.box = self.mbox = null;
+            //拖动框
+            if (self.dr) self.dr.destroy();
+
+            //解除绑定的事件
+            self._es.forEach(function (api) {
+                api.off();
+            });
+
+            self.box = self.mbox = self.dr = null;
 
             if (self.onRemove) self.onRemove();
 
             return self.fire();
         }
     });
+
+    Box.alias("remove", "destroy");
 
     //构造器:弹出层
     function WinBox(ops) {
@@ -596,7 +636,7 @@
 
             if (boxHead.offsetWidth < 10) setWidth(boxHead, box.offsetWidth);
 
-            if (ops.mask) self.mbox = getMaskBox();
+            if (ops.mask) self.mbox = ops.mask == "new" ? new MaskBox() : getMaskBox();
 
             var action_close = ops.close || "hide",
                 callback_close = self.getEventCallback(action_close);
@@ -606,7 +646,7 @@
 
             //按ESC关闭事件
             if (ops.esc !== false) {
-                E.add(document, "keyup", function (e) {
+                self.bind(document, "keyup", function (e) {
                     if (e.keyCode == 27) callback_close();
                 });
             }
@@ -619,7 +659,7 @@
             fire(ops.init, self, box, ops);
 
             if (ops.drag !== false) {
-                setDrag(box, {
+                self.dr = setDrag(box, {
                     target: boxHead,
                     center: ops.center !== false,
 
