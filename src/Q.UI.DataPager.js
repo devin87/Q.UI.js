@@ -3,7 +3,7 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/08/27 15:09
+* update:2015/10/10 10:06
 */
 (function (undefined) {
     "use strict";
@@ -49,9 +49,11 @@
 
         if (first > 2) tmp.push(0);
         for (var i = first; i <= last; i++) tmp.push(i);
-        if (last < totalPage - 1) tmp.push(0);
 
-        tmp.push(totalPage);
+        if (totalPage > size) {
+            if (last < totalPage - 1) tmp.push(0);
+            tmp.push(totalPage);
+        }
 
         return tmp;
     }
@@ -75,7 +77,7 @@
             ops.cache = ops.preload = false;
         }
 
-        self.set(ops.totalCount, ops.pageSize || 10).setData(ops.data).go(ops.page || 1);
+        self.set(ops.totalCount, ops.pageSize || 10).setData(ops.data).go(ops.page);
     }
 
     factory(DataPager).extend({
