@@ -3,7 +3,7 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/10/10 10:06
+* update:2015/10/15 12:27
 */
 (function (undefined) {
     "use strict";
@@ -71,6 +71,8 @@
             if (boxNav) {
                 $(boxNav).on("click", "li", function () {
                     self.go($(this).attr("x"), true);
+
+                    if (self.onclick) self.onclick.call(self, self.page);
                 });
             }
         } else {
@@ -142,12 +144,12 @@
             return this._load(page, this.draw);
         },
         //重新载入当前数据并渲染
-        reload: function () {
-            return this.load(this.page);
+        reload: function (page) {
+            return this.load(page || this.page);
         },
         //跳转到指定页
-        //isClick:是否点击按钮触发
-        go: function (page, isClick) {
+        //forced:是否强制跳转
+        go: function (page, forced) {
             var self = this;
 
             if (isNaN(page)) return self;
@@ -156,13 +158,12 @@
             if (self.totalPage != undefined && page > self.totalPage) page = self.totalPage;
             if (page < 1) page = 1;
 
-            if (page == self.page) return self;
+            if (page == self.page && !forced) return self;
             self.page = page;
 
             self.load(page);
             if (self.ops.load && self.ops.preload) self._load(page + 1);
 
-            if (isClick && self.onclick) self.onclick.call(self, page);
             if (self.onchange) self.onchange.call(self, page);
 
             return self;

@@ -2,7 +2,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/09/18 17:09
+* update:2015/10/15 14:14
 */
 (function (undefined) {
     "use strict";
@@ -19,6 +19,8 @@
         fire = Q.fire,
         async = Q.async,
         extend = Q.extend,
+
+        makeArray = Q.makeArray,
 
         getStyle = Q.getStyle,
         setStyle = Q.setStyle,
@@ -46,9 +48,10 @@
         setCssIfNot = Q.setCssIfNot,
         setCenter = Q.setCenter,
 
-        query = Q.query,
-
+        setInputDefault = Q.setInputDefault,
         clearSelection = Q.clearSelection,
+
+        query = Q.query,
 
         factory = Q.factory,
 
@@ -478,7 +481,7 @@
     factory(Box).extend({
         //在弹出框内查找对象
         find: function (pattern, context) {
-            return query(pattern, context || this.box);
+            return typeof pattern == "string" ? query(pattern, context || this.box) : makeArray(pattern);
         },
         //获取弹出框内查找到的第一个对象
         get: function (pattern, context) {

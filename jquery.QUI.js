@@ -3,7 +3,7 @@
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
 * https://github.com/devin87/Q.js
 * author:devin87@qq.com  
-* update:2015/09/09 10:50
+* update:2015/10/12 15:12
 */
 (function (undefined) {
     "use strict";
@@ -126,7 +126,7 @@
 
     //判断字符串是否是符合条件的整数
     function checkInt(str, min, max) {
-        return checkNum(str, min, max) && n === Math.floor(n);
+        return !isNaN(str) && isInt(+str, min, max);
     }
 
     //将字符串转为大写,若str不是字符串,则返回defValue
@@ -1112,7 +1112,7 @@
 ﻿/*
 * Q.Queue.js 队列
 * author:devin87@qq.com
-* update:2015/08/13 10:45
+* update:2015/10/15 10:39
 */
 (function (undefined) {
     "use strict";
@@ -1438,7 +1438,9 @@
 
     //ajax队列
     function ajaxQueue(ops) {
-        return new Queue(extend(ops || {}, {
+        ops = ops || {};
+
+        return new Queue(extend(ops, {
             exec: ops.ajax || Q.ajax || $.ajax,
             injectIndex: 1,
             injectCallback: "complete"
@@ -2658,7 +2660,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/09/18 17:09
+* update:2015/10/15 14:14
 */
 (function (undefined) {
     "use strict";
@@ -2675,6 +2677,8 @@
         fire = Q.fire,
         async = Q.async,
         extend = Q.extend,
+
+        makeArray = Q.makeArray,
 
         getStyle = Q.getStyle,
         setStyle = Q.setStyle,
@@ -2702,9 +2706,10 @@
         setCssIfNot = Q.setCssIfNot,
         setCenter = Q.setCenter,
 
-        query = Q.query,
-
+        setInputDefault = Q.setInputDefault,
         clearSelection = Q.clearSelection,
+
+        query = Q.query,
 
         factory = Q.factory,
 
@@ -3134,7 +3139,7 @@
     factory(Box).extend({
         //在弹出框内查找对象
         find: function (pattern, context) {
-            return query(pattern, context || this.box);
+            return typeof pattern == "string" ? query(pattern, context || this.box) : makeArray(pattern);
         },
         //获取弹出框内查找到的第一个对象
         get: function (pattern, context) {
