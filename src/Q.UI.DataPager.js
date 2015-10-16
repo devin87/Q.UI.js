@@ -3,7 +3,7 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/10/15 12:27
+* update:2015/10/16 10:26
 */
 (function (undefined) {
     "use strict";
@@ -108,6 +108,8 @@
                 ops = self.ops,
                 onload = self.onload;
 
+            self.page = page;
+
             var complete = function (list) {
                 if (onload) onload.call(self, list);
                 if (callback) callback.call(self, list);
@@ -159,7 +161,6 @@
             if (page < 1) page = 1;
 
             if (page == self.page && !forced) return self;
-            self.page = page;
 
             self.load(page);
             if (self.ops.load && self.ops.preload) self._load(page + 1);
