@@ -3,7 +3,7 @@
 * Q.UI.ContextMenu.js 多级上下文菜单(右键菜单)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/07/15 12:07
+* update:2015/11/26 17:19
 */
 (function (undefined) {
     "use strict";
@@ -38,9 +38,7 @@
 
     //---------------------- 上下文菜单 ----------------------
     function ContextMenu(data, ops) {
-        extend(this, ops);
-
-        this.init(data);
+        this.set(ops).init(data);
     }
 
     factory(ContextMenu).extend({
@@ -51,12 +49,17 @@
             self.draw(data);
 
             if (self.autoHide !== false) {
-                self._e0 = E.add(document, "mousedown", function () {
+                self._e0 = E.add(document, "click", function () {
                     self.hide();
                 });
             }
 
             return self;
+        },
+        //菜单设置 {x,y,rangeX,rangeY}
+        set: function (ops) {
+            extend(this, ops, true);
+            return this;
         },
         //生成所有菜单
         draw: function (data) {
@@ -102,10 +105,7 @@
                     var el = this,
                         j = el._j;
 
-                    if (hasClass(el, "x-disabled") || (self._getSubMenu(j) && !self.isFireAll)) {
-                        E.stop(e);
-                        return;
-                    }
+                    if (hasClass(el, "x-disabled") || (self._getSubMenu(j) && !self.isFireAll)) return false;
 
                     var item = self._getItem(j);
 
@@ -193,7 +193,7 @@
                 item._j = item_index;
 
                 list_item[item_index] = { node: item, i: menu_index, j: item_index, data: m };
-                if (m.id) map_item[m.id] = item_index;
+                if (m.id != undefined) map_item[m.id] = item_index;
 
                 if (m.split) {
                     item.className = "x-split";
@@ -361,7 +361,7 @@
 
                 if (zIndex_sub <= zIndex) sub_node.style.zIndex = zIndex + 1;
 
-                self._setPos(sub_menu, offset.left + offset.width - 2, offset.top, node);
+                self._setPos(sub_menu, offset.left + el.offsetWidth - 2, offset.top, node);
             }
 
             self.i = i;
@@ -416,7 +416,7 @@
 
         //显示
         show: function (x, y) {
-            return this.hide()._setPos(this._menus[0], x, y);
+            return this._setPos(this._menus[0], x, y);
         },
         //隐藏
         hide: function () {
@@ -445,8 +445,27 @@
         },
 
         //自动切换显示或隐藏
-        toggle: function () {
-            return this.isHidden() ? this.show() : this.hide();
+        toggle: function (x, y) {
+            return this.isHidden() ? this.show(x, y) : this.hide();
+        },
+
+        //注销菜单
+        destroy: function () {
+            var self = this;
+
+            if (self._e0) self._e0.off();
+            if (self._e1) self._e1.off();
+
+            self._menus.forEach(function (menu) {
+                menu.node.innerHTML = '';
+                $(menu.node).remove();
+            });
+
+            Object.forEach(self, function (prop) {
+                self[prop] = null;
+            });
+
+            return self;
         }
     });
 

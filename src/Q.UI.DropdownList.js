@@ -3,7 +3,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/07/15 12:07
+* update:2015/11/26 13:04
 */
 (function (undefined) {
     "use strict";
@@ -97,14 +97,16 @@
 
             //下拉列表
             if (isDropdownList) {
-                E.add(document, "mousedown", function () {
-                    self.hide();
-                });
+                if (ops.autoHide !== false) {
+                    E.add(document, "mousedown", function () {
+                        self.hide();
+                    });
+                }
 
                 E.add(box, "mousedown", function (e) {
                     self.toggle();
 
-                    E.stop(e);
+                    return false;
                 });
 
                 listener_item = {
@@ -113,16 +115,18 @@
                         var index = this.x,
                             item = self.items[index];
 
-                        self.hide();
-
                         fire(self.onclick, self, item, index);
+
+                        if (item.disabled) return;
+
+                        self.hide();
                         if (index != self.index) self.select(index);
                     },
                     mouseenter: function () {
-                        var el = this;
-                        if (hasClass(el, "x-disabled")) return;
+                        var index = this.x,
+                            item = self.items[index];
 
-                        self.active(el.x);
+                        if (!item.disabled) self.active(index);
                     }
                 };
             } else {

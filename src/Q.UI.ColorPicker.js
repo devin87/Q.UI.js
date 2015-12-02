@@ -3,7 +3,7 @@
 * Q.UI.ColorPicker.js 颜色选择器
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/07/15 12:07
+* update:2015/12/02 13:19
 */
 (function (undefined) {
     "use strict";
@@ -12,14 +12,14 @@
 
         isFunc = Q.isFunc,
 
-        //extend = Q.extend,
+        extend = Q.extend,
         //fire = Q.fire,
 
         getFirst = Q.getFirst,
         getNext = Q.getNext,
         getLast = Q.getLast,
 
-        getOffset = Q.offset,
+        //getOffset = Q.offset,
 
         createEle = Q.createEle,
         factory = Q.factory,
@@ -83,17 +83,14 @@
     var LIST_COLOR = ['#000000', '#333333', '#666666', '#999999', '#cccccc', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff'];
 
     //颜色选择器
-    function ColorPicker(target, callback) {
+    function ColorPicker(ops) {
         var self = this;
 
         //默认行数与列数
         self.row = 12;  //不得超过 LIST_COLOR.length
         self.col = 21;
 
-        //默认设置对象的前景色(字体颜色)
-        self.isColor = true;
-
-        self.set(target, callback).init();
+        self.set(ops).init();
     }
 
     factory(ColorPicker).extend({
@@ -152,7 +149,7 @@
                 //选择并设置颜色
                 click: function (e) {
                     var color = this.style.backgroundColor;
-                    self.fire(color).setColor(color).hide();
+                    self.fire(color).hide();
                 }
             }, "td");
 
@@ -161,61 +158,28 @@
 
             return self.drawCubeColor().hide();
         },
-        //设置模式
-        //isColor:更新目标(target)的前景色
-        //isBgColor:更新目标(target)的背景色
-        mode: function (isColor, isBgColor) {
-            var self = this;
+        //设置 { isHex,callback }
+        //isHex:输出为16进制颜色
+        set: function (ops) {
+            extend(this, ops, true);
 
-            self.isColor = isColor;
-            self.isBgColor = isBgColor;
-
-            return self;
-        },
-        //设置目标和回调函数
-        set: function (target, callback) {
-            if (isFunc(target)) {
-                callback = target;
-                target = undefined;
-            }
-
-            var self = this;
-
-            if (target) {
-                var offset = getOffset(target);
-                self.show(offset.left, offset.top + offset.height).hide();
-
-                self.target = target;
-            }
-            if (callback) self.callback = callback;
-
-            return self;
+            return this.setPreview(ops.color);
         },
 
         //触发回调函数
         fire: function (color) {
             var self = this;
-            if (isFunc(self.callback)) self.callback.call(self, color);
-            return self;
-        },
-        //设置颜色到对象
-        setColor: function (color) {
-            var self = this,
-                target = self.target;
-
-            if (target) {
-                if (self.isColor) target.style.color = color;
-                if (self.isBgColor) target.style.backgroundColor = color;
-            }
-
+            if (isFunc(self.callback)) self.callback.call(self, self.isHex ? toHex(color) : color);
             return self;
         },
         //设置预览颜色
         setPreview: function (color) {
             var self = this;
 
-            self.boxPreview.style.backgroundColor = color;
-            self.boxValue.innerHTML = toHex(color).toUpperCase();
+            if (color) {
+                self.boxPreview.style.backgroundColor = color;
+                self.boxValue.innerHTML = toHex(color).toUpperCase();
+            }
 
             return self;
         },
@@ -328,7 +292,6 @@
         //隐藏
         hide: function () {
             set_pos(this.box, POS_VALUE_HIDDEN, POS_VALUE_HIDDEN);
-
             return this;
         },
 
@@ -343,8 +306,8 @@
         },
 
         //自动切换显示或隐藏
-        toggle: function () {
-            return this.isHidden() ? this.show() : this.hide();
+        toggle: function (x, y) {
+            return this.isHidden() ? this.show(x, y) : this.hide();
         }
     });
 

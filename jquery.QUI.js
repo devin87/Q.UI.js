@@ -3,7 +3,7 @@
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
 * https://github.com/devin87/Q.js
 * author:devin87@qq.com  
-* update:2015/10/16 11:05
+* update:2015/12/02 13:15
 */
 (function (undefined) {
     "use strict";
@@ -180,7 +180,7 @@
     //eg:按1-10项产生斐波那契数列 =>arr(10, function (value, i, list) { return i > 1 ? list[i - 1] + list[i - 2] : 1; })
     //length:数组长度
     //value:数组项的初始值
-    //step:第增值或处理函数(当前值,索引,当前产生的数组)
+    //step:递增值或处理函数(当前值,索引,当前产生的数组)
     function arr(length, value, step) {
         if (isFunc(value)) {
             step = value;
@@ -206,6 +206,28 @@
         }
 
         return list;
+    }
+
+    //根据指定的键或索引抽取数组项的值
+    //eg:vals([{id:1},{id:2}], "id")  =>  [1,2]
+    //eg:vals([[1,"a"],[2,"b"]], 1)   =>  ["a","b"]
+    //skipUndefined:是否跳过值不存在的项,默认为true
+    function vals(list, prop, skipUndefined) {
+        if (!list) return [];
+
+        skipUndefined = skipUndefined !== false;
+
+        var len = list.length,
+            i = 0,
+            item,
+            tmp = [];
+
+        for (; i < len; i++) {
+            item = list[i];
+            if ((item && item[prop] != undefined) || !skipUndefined) tmp.push(item[prop]);
+        }
+
+        return tmp;
     }
 
     //prototype 别名 eg:alias(Array,"forEach","each");
@@ -236,6 +258,34 @@
             if (forced || destination[key] === undefined) destination[key] = source[key];
         }
         return destination;
+    }
+
+    //数据克隆（for undefined、null、string、number、boolean、array、object）
+    function clone(data) {
+        if (!data) return data;
+
+        switch (typeof data) {
+            case "string":
+            case "number":
+            case "boolean":
+                return data;
+        }
+
+        var result;
+
+        if (isArray(data)) {
+            result = [];
+            for (var i = 0, len = data.length; i < len; i++) {
+                result[i] = clone(data[i]);
+            }
+        } else if (isObject(data)) {
+            result = {};
+            for (var key in data) {
+                if (has.call(data, key)) result[key] = clone(data[key]);
+            }
+        }
+
+        return result;
     }
 
     //将数组或类数组转换为键值对
@@ -729,10 +779,8 @@
         //根据指定的键或索引抽取数组项的值 
         //eg:[{id:1},{id:2}]    ->  ret.items("id") => [1,2]
         //eg:[[1,"a"],[2,"b"]]  ->  ret.items(1)    => ["a","b"]
-        items: function (key) {
-            return this.map(function (obj) {
-                return obj[key];
-            });
+        items: function (prop, skipUndefined) {
+            return vals(this, prop, skipUndefined);
         },
         //将数组转换为键值对
         //value:若为空,则使用数组索引;为处理函数,需返回包含键值的数组 eg: value(item,i) => [key,value]
@@ -1097,9 +1145,11 @@
         makeArray: makeArray,
 
         arr: arr,
+        vals: vals,
 
         alias: alias,
         extend: extend,
+        clone: clone,
 
         toMap: toMap,
         toObjectMap: toObjectMap,
@@ -2688,7 +2738,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/10/15 14:14
+* update:2015/11/30 12:06
 */
 (function (undefined) {
     "use strict";
@@ -2734,6 +2784,7 @@
         setCssIfNot = Q.setCssIfNot,
         setCenter = Q.setCenter,
 
+        setInputError = Q.setInputError,
         setInputDefault = Q.setInputDefault,
         clearSelection = Q.clearSelection,
 
@@ -3522,7 +3573,7 @@
 * Q.UI.ContextMenu.js 多级上下文菜单(右键菜单)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/07/15 12:07
+* update:2015/11/26 17:19
 */
 (function (undefined) {
     "use strict";
@@ -3557,9 +3608,7 @@
 
     //---------------------- 上下文菜单 ----------------------
     function ContextMenu(data, ops) {
-        extend(this, ops);
-
-        this.init(data);
+        this.set(ops).init(data);
     }
 
     factory(ContextMenu).extend({
@@ -3570,12 +3619,17 @@
             self.draw(data);
 
             if (self.autoHide !== false) {
-                self._e0 = E.add(document, "mousedown", function () {
+                self._e0 = E.add(document, "click", function () {
                     self.hide();
                 });
             }
 
             return self;
+        },
+        //菜单设置 {x,y,rangeX,rangeY}
+        set: function (ops) {
+            extend(this, ops, true);
+            return this;
         },
         //生成所有菜单
         draw: function (data) {
@@ -3621,10 +3675,7 @@
                     var el = this,
                         j = el._j;
 
-                    if (hasClass(el, "x-disabled") || (self._getSubMenu(j) && !self.isFireAll)) {
-                        E.stop(e);
-                        return;
-                    }
+                    if (hasClass(el, "x-disabled") || (self._getSubMenu(j) && !self.isFireAll)) return false;
 
                     var item = self._getItem(j);
 
@@ -3712,7 +3763,7 @@
                 item._j = item_index;
 
                 list_item[item_index] = { node: item, i: menu_index, j: item_index, data: m };
-                if (m.id) map_item[m.id] = item_index;
+                if (m.id != undefined) map_item[m.id] = item_index;
 
                 if (m.split) {
                     item.className = "x-split";
@@ -3880,7 +3931,7 @@
 
                 if (zIndex_sub <= zIndex) sub_node.style.zIndex = zIndex + 1;
 
-                self._setPos(sub_menu, offset.left + offset.width - 2, offset.top, node);
+                self._setPos(sub_menu, offset.left + el.offsetWidth - 2, offset.top, node);
             }
 
             self.i = i;
@@ -3935,7 +3986,7 @@
 
         //显示
         show: function (x, y) {
-            return this.hide()._setPos(this._menus[0], x, y);
+            return this._setPos(this._menus[0], x, y);
         },
         //隐藏
         hide: function () {
@@ -3964,8 +4015,27 @@
         },
 
         //自动切换显示或隐藏
-        toggle: function () {
-            return this.isHidden() ? this.show() : this.hide();
+        toggle: function (x, y) {
+            return this.isHidden() ? this.show(x, y) : this.hide();
+        },
+
+        //注销菜单
+        destroy: function () {
+            var self = this;
+
+            if (self._e0) self._e0.off();
+            if (self._e1) self._e1.off();
+
+            self._menus.forEach(function (menu) {
+                menu.node.innerHTML = '';
+                $(menu.node).remove();
+            });
+
+            Object.forEach(self, function (prop) {
+                self[prop] = null;
+            });
+
+            return self;
         }
     });
 
@@ -3979,7 +4049,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/07/15 12:07
+* update:2015/11/26 13:04
 */
 (function (undefined) {
     "use strict";
@@ -4073,14 +4143,16 @@
 
             //下拉列表
             if (isDropdownList) {
-                E.add(document, "mousedown", function () {
-                    self.hide();
-                });
+                if (ops.autoHide !== false) {
+                    E.add(document, "mousedown", function () {
+                        self.hide();
+                    });
+                }
 
                 E.add(box, "mousedown", function (e) {
                     self.toggle();
 
-                    E.stop(e);
+                    return false;
                 });
 
                 listener_item = {
@@ -4089,16 +4161,18 @@
                         var index = this.x,
                             item = self.items[index];
 
-                        self.hide();
-
                         fire(self.onclick, self, item, index);
+
+                        if (item.disabled) return;
+
+                        self.hide();
                         if (index != self.index) self.select(index);
                     },
                     mouseenter: function () {
-                        var el = this;
-                        if (hasClass(el, "x-disabled")) return;
+                        var index = this.x,
+                            item = self.items[index];
 
-                        self.active(el.x);
+                        if (!item.disabled) self.active(index);
                     }
                 };
             } else {

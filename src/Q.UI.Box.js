@@ -3,7 +3,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/10/15 14:14
+* update:2015/11/30 12:06
 */
 (function (undefined) {
     "use strict";
@@ -49,6 +49,7 @@
         setCssIfNot = Q.setCssIfNot,
         setCenter = Q.setCenter,
 
+        setInputError = Q.setInputError,
         setInputDefault = Q.setInputDefault,
         clearSelection = Q.clearSelection,
 
