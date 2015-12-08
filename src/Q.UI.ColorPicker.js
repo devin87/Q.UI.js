@@ -3,7 +3,7 @@
 * Q.UI.ColorPicker.js 颜色选择器
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/12/02 13:19
+* update:2015/12/08 14:39
 */
 (function (undefined) {
     "use strict";
@@ -163,7 +163,7 @@
         set: function (ops) {
             extend(this, ops, true);
 
-            return this.setPreview(ops.color);
+            return this.setPreview((ops || {}).color);
         },
 
         //触发回调函数
