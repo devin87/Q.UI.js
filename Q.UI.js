@@ -2,7 +2,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/11/30 12:06
+* update:2016/01/12 16:02
 */
 (function (undefined) {
     "use strict";
@@ -403,8 +403,10 @@
                 startY = e.clientY - ele.offsetTop;
 
                 if (hasShadow) {
-                    Object.forEach(getOffset(ele), function (key, value) {
-                        setStyle(target, key, value);
+                    var offset = getOffset(ele);
+
+                    Object.forEach({ left: offset.left, top: offset.top, width: ele.offsetWidth, height: ele.offsetHeight }, function (key, value) {
+                        target.style[key] = value + "px";
                     });
 
                     //cssShow(target);
