@@ -49,9 +49,14 @@ module.exports = {
                     "def": "//devin87@qq.com\n",
                     "Q.js": "//Q.js devin87@qq.com\n//mojoQuery&mojoFx scott.cgi\n",
                     "Q.mini.js": "//Q.mini.js devin87@qq.com\n",
-                    "jquery-1.11.3.js": "/*! jQuery v1.11.3 | (c) 2005, 2015 jQuery Foundation, Inc. | jquery.org/license */\n"
+                    "jquery-1.11.3.js": "/*! jQuery v1.11.3 | (c) jQuery Foundation | jquery.org/license */\n",
+                    "jquery-1.12.0.js": "/*! jQuery v1.12.0 | (c) jQuery Foundation | jquery.org/license */\n"
                 },
-                "//build:%NOW%\n"
+                {
+                    "def": "//build:%NOW%\n",
+                    "jquery-1.11.3.js": "",
+                    "jquery-1.12.0.js": ""
+                }
             ]
         }
     ],
