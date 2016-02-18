@@ -3,7 +3,7 @@
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
 * https://github.com/devin87/Q.js
 * author:devin87@qq.com  
-* update:2015/12/02 13:15
+* update:2016/02/17 17:39
 */
 (function (undefined) {
     "use strict";
@@ -106,7 +106,7 @@
 
     //检测是否为大于0的数字
     function isUNum(n) {
-        return n !== 0 && isNum(n, 0);
+        return typeof n == "number" && n > 0;
     }
 
     //检测是否为整数
@@ -319,18 +319,17 @@
     }
 
     //将对象数组转换为键值对
-    //keyProp:对象中作为键的属性
-    //valueProp:对象中作为值的属性,若为空,则值为对象本身;为true时同isBuildIndex
-    //isBuildIndex:是否给对象添加index属性,值为对象在数组中的索引
-    function toObjectMap(list, keyProp, valueProp, isBuildIndex) {
+    //propKey:对象中作为键的属性
+    //propValue:对象中作为值的属性,若为空,则值为对象本身;若为true,则给对象添加index属性,值为对象在数组中的索引
+    function toObjectMap(list, propKey, propValue) {
         if (!list) return;
 
-        if (valueProp === true) {
-            isBuildIndex = valueProp;
-            valueProp = undefined;
-        }
+        var map = {}, isBuildIndex = false;
 
-        var map = {};
+        if (propValue === true) {
+            isBuildIndex = propValue;
+            propValue = undefined;
+        }
 
         for (var i = 0, len = list.length; i < len; i++) {
             var obj = list[i];
@@ -338,7 +337,7 @@
 
             if (isBuildIndex) obj.index = i;
 
-            map[obj[keyProp]] = valueProp ? obj[valueProp] : obj;
+            map[obj[propKey]] = propValue ? obj[propValue] : obj;
         }
 
         return map;
@@ -613,19 +612,14 @@
         reverse: function () {
             return this.split("").reverse().join("");
         },
-        //转为html输出(html编码) eg:\n => <br/>
-        toHtml: function () {
+        //html编码 eg:\n => <br/>
+        htmlEncode: function () {
             return this.replace(/\x26/g, "&amp;").replace(/\x3c/g, "&lt;").replace(/\x3e/g, "&gt;").replace(/\r?\n|\r/g, "<br/>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;").replace(/\s/g, "&nbsp;");
         },
-        //转为text输出(html解码) eg:<br/> => \n
-        toText: function () {
+        //html解码 eg:<br/> => \n
+        htmlDecode: function () {
             return this.replace(/<br[^>]*>/ig, "\n").replace(/<script[^>]*>([^~]|~)+?<\/script>/gi, "").replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
         }
-    });
-
-    String.alias({
-        toHtml: "htmlEncode",
-        toText: "htmlDecode"
     });
 
     //----------------------------- Number extend -----------------------------
@@ -788,11 +782,10 @@
             return toMap(this, value, ignoreCase);
         },
         //将对象数组转换为键值对
-        //keyProp:对象中作为键的属性
-        //valueProp:对象中作为值的属性,若为空,则值为对象本身;为true时同isBuildIndex
-        //isBuildIndex:是否给对象添加index属性,值为对象在数组中的索引
-        toObjectMap: function (keyProp, valueProp, isBuildIndex) {
-            return toObjectMap(this, keyProp, valueProp, isBuildIndex);
+        //propKey:对象中作为键的属性
+        //propValue:对象中作为值的属性,若为空,则值为对象本身;若为true,则给对象添加index属性,值为对象在数组中的索引
+        toObjectMap: function (propKey, propValue) {
+            return toObjectMap(this, propKey, propValue);
         }
     });
 
@@ -833,14 +826,14 @@
             return !isNaN(this.valueOf());
         },
         //格式化日期显示 eg:(new Date()).format("yyyy-MM-dd hh:mm:ss");
-        format: function (format, lang) {
-            lang = lang || {};
+        format: function (format, ops) {
+            ops = ops || {};
 
-            if (!this.isValid()) return lang.invalid || "--";
+            if (!this.isValid()) return ops.invalid || "--";
 
-            var months = lang.months,
-                weeks = lang.weeks || WEEKS,
-                aps = lang.aps || APS,
+            var months = ops.months,
+                weeks = ops.weeks || WEEKS,
+                aps = ops.aps || APS,
 
                 len = DATE_REPLACEMENTS.length,
                 i = 0;
@@ -878,7 +871,7 @@
 
             return format;
         },
-        //通过将一个时间间隔与指定 date 的指定 part 相加，返回一个新的 Date 值
+        //按照part(y|M|d|h|m|s|ms)添加时间间隔
         add: function (part, n) {
             var date = this;
             switch (part) {
@@ -987,10 +980,11 @@
     //types:自定义事件列表
     //bind:事件函数绑定的上下文 eg:fn.call(bind)
     function Listener(types, bind) {
-        this.map = {};
-        this.bind = bind;
-
         var self = this;
+
+        self.map = {};
+        self.bind = bind;
+
         types.forEach(function (type) {
             self.map[type] = [];
         });
@@ -999,7 +993,7 @@
     Listener.prototype = {
         constructor: Listener,
 
-        //添加事件 eg:listener.add("start",fn);
+        //添加自定义事件 eg:listener.add("start",fn);
         add: function (type, fn) {
             var map = this.map;
 
@@ -1013,15 +1007,31 @@
 
             return this;
         },
+        //移除自定义事件,若fn为空,则移除该类型下的所有事件
+        remove: function (type, fn) {
+            if (fn != undefined) {
+                var list = this.map[type], i = list.length;
+                while (--i >= 0) {
+                    if (list[i] == fn) list = list.splice(i, 1);
+                }
+            } else {
+                this.map[type] = [];
+            }
+
+            return this;
+        },
         //触发自定义事件 eg:listener.trigger("click",args);
         trigger: function (type, args) {
             var self = this,
-                list = self.map[type];
+                list = self.map[type],
+                len = list.length,
+                i = 0;
 
-            return list.length > 0 ? list.map(function (fn) {
-                //确保args为数组
-                return fn.apply(self.bind, [].concat(args));
-            }) : undefined;
+            for (; i < len; i++) {
+                if (list[i].apply(self.bind, [].concat(args)) === false) break;
+            }
+
+            return self;
         }
     };
 
@@ -1190,7 +1200,7 @@
 ﻿/*
 * Q.Queue.js 队列
 * author:devin87@qq.com
-* update:2015/10/15 10:39
+* update:2016/02/18 16:30
 */
 (function (undefined) {
     "use strict";
@@ -1247,7 +1257,7 @@
 
         self.reset();
 
-        delay(self.addList, self, 0, [tasks]);
+        self.addList(tasks);
     }
 
     factory(Queue).extend({
@@ -1541,7 +1551,7 @@
 ﻿/*
 * Q.core.js (包括 通用方法、JSON、Cookie、Storage 等) for browser
 * author:devin87@qq.com  
-* update:2015/09/30 15:40
+* update:2016/02/17 17:12
 */
 (function (undefined) {
     "use strict";
@@ -2161,9 +2171,6 @@
         quirk: is_quirk_mode,
 
         ready: ready,
-
-        encode: encode_url_param,
-        decode: decode_url_param,
 
         param: process_url_param,
         join: join_url,
