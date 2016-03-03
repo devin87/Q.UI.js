@@ -1200,7 +1200,7 @@
 ﻿/*
 * Q.Queue.js 队列
 * author:devin87@qq.com
-* update:2016/02/18 16:30
+* update:2016/03/03 17:54
 */
 (function (undefined) {
     "use strict";
@@ -1411,6 +1411,8 @@
             };
 
             if (injectCallback != undefined) {
+                if (!data) data = {};
+
                 //避免重复注入
                 var qcallback = data.__qcallback;
                 originalCallback = qcallback || data[injectCallback];
@@ -2745,7 +2747,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/01/12 16:02
+* update:2016/03/03 17:57
 */
 (function (undefined) {
     "use strict";
@@ -2784,7 +2786,6 @@
         cssShow = Q.show,
         cssHide = Q.hide,
         isHidden = Q.isHidden,
-        cssToggle = Q.toggle,
 
         addClass = Q.addClass,
 
@@ -3249,25 +3250,15 @@
         },
 
         //绑定事件,同 Event.add,不过会缓存事件句柄,用于统一销毁
-        bind: function () {
-            this._es.push(E.add.apply(E, arguments));
-            return this;
+        bind: function (selector, types, fn, data) {
+            var self = this;
+            self._es.push(E.add(self.find(selector), types, self.getEventCallback(fn, data)));
+            return self;
         },
-        //将事件绑定到查找到的元素上,并非事件代理
-        on: function (pattern, types, fn, data) {
-            var self = this,
-                list = self.find(pattern);
-
-            if (isObject(types)) {
-                data = fn;
-
-                Object.forEach(types, function (type, fn) {
-                    self.bind(list, type, self.getEventCallback(fn, data));
-                });
-            } else {
-                self.bind(list, types, self.getEventCallback(fn, data));
-            }
-
+        //事件代理,将事件代理到box上执行
+        on: function (types, selector, fn, data) {
+            var self = this;
+            self._es.push(E.add(self.box, types, selector, self.getEventCallback(fn, data)));
             return self;
         },
         //显示
@@ -3293,8 +3284,7 @@
         },
         //自动切换显示或隐藏
         toggle: function () {
-            cssToggle(this.box);
-            return this;
+            return isHidden(this.box) ? this.show() : this.hide();
         },
         //移除
         remove: function () {
@@ -3338,7 +3328,7 @@
 
             self.callback = ops.callback;
 
-            var html = '' +
+            var html =
                 '<div class="x-head">' +
                     '<h2 class="x-title">' + (ops.title || '弹出框') + '</h2>' +
                     '<a class="x-close" title="点击关闭">X</a>' +
@@ -3390,7 +3380,7 @@
                 callback_close = self.getEventCallback(action_close);
 
             //点击关闭事件
-            self.on(".x-close", "click", action_close);
+            self.bind(".x-close", "click", action_close);
 
             //按ESC关闭事件
             if (ops.esc !== false) {
@@ -3469,13 +3459,28 @@
     function get_bottom_html(mode, style) {
         var buttonStyle = 'inline-block w-button w-' + (style || "dark"),
 
-            html = '' +
-            '<div class="x-bottom">' +
-                '<div class="' + buttonStyle + ' x-submit">确定</div>' +
-                (mode == 2 ? '<div class="' + buttonStyle + ' x-cancel">取消</div>' : '') +
-            '</div>';
+            html =
+                '<div class="x-bottom">' +
+                    '<div class="' + buttonStyle + ' x-submit">确定</div>' +
+                    (mode == 2 ? '<div class="' + buttonStyle + ' x-cancel">取消</div>' : '') +
+                '</div>';
 
         return html;
+    }
+
+    //获取弹出框配置对象
+    function get_dialog_ops(title, msg, fn, ops) {
+        if (typeof fn === "object") {
+            ops = fn;
+            fn = ops;
+        }
+
+        ops = extend({}, ops);
+        if (isFunc(fn)) ops.callback = fn;
+        if (!ops.title) ops.title = title;
+        ops.html = msg;
+
+        return ops;
     }
 
     var dialog = {
@@ -3484,46 +3489,34 @@
 
         //提示框
         alert: function (msg, fn, ops) {
-            var ops = ops || {};
-            if (isFunc(fn)) ops.callback = fn;
-            else if (typeof fn === "object") ops = fn;
-
-            if (!ops.title) ops.title = "提示信息";
+            ops = get_dialog_ops("提示信息", msg, fn, ops);
             //ops.icon = 'images/Q/alert.gif';
             ops.iconHtml = '<div class="ico x-alert"></div>';
-            ops.html = msg;
 
             return createDialogBox(ops);
         },
         //确认框
         confirm: function (msg, fn, ops) {
-            var ops = ops || {};
-            if (isFunc(fn)) ops.callback = fn;
-            else if (typeof fn === "object") ops = fn;
-
-            if (!ops.title) ops.title = "确认信息";
-            ops.html = msg;
+            ops = get_dialog_ops("确认信息", msg, fn, ops);
             if (!ops.bottom) ops.bottom = get_bottom_html(2);
             ops.mask = ops.mask !== false;
 
             var box = createDialogBox(ops);
-
-            box.on(".x-submit", "click", "remove", true).on(".x-cancel", "click", "remove", false);
-
-            return box;
+            return box.bind(".x-submit", "click", "remove", true).bind(".x-cancel", "click", "remove", false);
         },
         prompt: function (msg, fn, ops) {
-            var ops = ops || {};
-            if (typeof fn === "object") ops = fn;
+            ops = get_dialog_ops("输入信息", undefined, fn, ops);
 
-            if (!ops.title) ops.title = "输入信息";
-            ops.html = '<div class="x-text">' + msg + '</div><div class="x-input"><input type="' + (ops.pwd ? 'password' : 'text') + '" /></div>';
-            if (!ops.width) ops.width = 320;
+            var html =
+                '<div class="x-text">' + msg + '</div>' +
+                '<div class="x-input"><input type="' + (ops.pwd ? 'password' : 'text') + '" /></div>';
+
+            ops.html = html;
             if (!ops.bottom) ops.bottom = get_bottom_html(2);
 
-            var box = createDialogBox(ops);
+            var box = createDialogBox(ops),
+                input = box.get(".x-input>input");
 
-            var input = box.get(".x-input>input");
             input.focus();
             input.value = def(ops.value, "");
 
@@ -3534,26 +3527,25 @@
             };
 
             //输入框快捷提交
-            box.on(input, "keyup", function (e) {
+            box.bind(input, "keyup", function (e) {
                 if (e.keyCode == 13) submit();
                 else setInputDefault(this);
             });
 
             //确定与取消
-            box.on(".x-submit", "click", submit).on(".x-cancel", "click", "remove");
-
-            return box;
+            return box.bind(".x-submit", "click", submit).bind(".x-cancel", "click", "remove");
         },
 
         bottom: get_bottom_html,
 
         //显示加载框
         showLoading: function (ops) {
-            ops = ops || { html: "正在加载数据,请稍后…" };
-            //ops.icon = 'images/Q/loading.gif';
-            ops.iconHtml = '<div class="ico x-loading"></div>';
+            ops = extend({}, ops);
 
             if (!ops.title) ops.title = "加载数据";
+            if (!ops.html) ops.html = "正在加载数据,请稍后…";
+            //ops.icon = 'images/Q/loading.gif';
+            ops.iconHtml = '<div class="ico x-loading"></div>';
 
             return createDialogBox(ops);
         }
@@ -4625,5 +4617,121 @@
     //------------------------- export -------------------------
 
     Q.DataPager = DataPager;
+
+})();
+
+﻿/*
+* Q.UI.Tabs.js 选项卡插件
+* author:devin87@qq.com  
+* update:2016/02/25 17:24
+*/
+(function () {
+    "use strict";
+
+    var async = Q.async,
+
+        getFirst = Q.getFirst,
+        parseHash = Q.parseHash,
+
+        $$ = $.find;
+
+    //选项卡对象
+    function Tabs(ops) {
+        ops = ops || {};
+
+        var self = this,
+
+            context = ops.context,
+
+            tabs = ops.tabs || $$(".tabTitle>li", context),
+            conts = ops.conts || $$(".tabCont>.turn-box", context);
+
+        self.tabs = tabs;
+        self.conts = conts;
+        self.map_loaded = {};
+        self.map_index = {};
+
+        //扫描index和对应的hash
+        tabs.forEach(function (el, i) {
+            //优先显示
+            if (el.getAttribute("x-def") == "1") ops.index = i;
+
+            var link = getFirst(el);
+            if (!link) return;
+
+            var hash = link.href.split("#")[1] || "", nav = parseHash(hash).nav;
+            if (nav) self.map_index[nav] = i;
+        });
+
+        //选项卡点击事件
+        tabs.forEach(function (el, i) {
+            $(el).click(function () {
+                self.showTab(i);
+            });
+        });
+
+        $(conts).hide();
+
+        //显示默认的选项卡
+        setTimeout(function () {
+            var index = ops.index;
+            if (index == undefined) index = self.map_index[ops.hash || parseHash().nav.slice(1)] || 0;
+
+            self.showTab(index);
+        }, 20);
+    }
+
+    Q.factory(Tabs).extend({
+        //获取选项卡元素
+        getTab: function (i) {
+            return this.tabs[i];
+        },
+        //获取对应的视图元素
+        getCont: function (i) {
+            return this.conts[i];
+        },
+        //该视图是否已加载过
+        hasLoaded: function (i) {
+            return !!this.map_loaded[i];
+        },
+        //显示指定索引的选项卡
+        showTab: function (index) {
+            var self = this,
+                lastIndex = self.index;
+
+            if (index === lastIndex) return;
+
+            if (lastIndex !== undefined) {
+                var lastTab = self.getTab(lastIndex),
+                    lastCont = self.getCont(lastIndex);
+
+                $(lastTab).removeClass("on");
+                $(lastCont).hide();
+            }
+
+            var tab = self.getTab(index),
+                cont = self.getCont(index),
+                map_loaded = self.map_loaded;
+
+            $(tab).addClass("on");
+            $(cont).show();
+
+            self.index = index;
+
+            //触发选项卡切换事件
+            async(window.onTabChange, 200, { index: index, tab: tab, cont: cont, loaded: map_loaded[index] });
+            if (!map_loaded[index]) map_loaded[index] = true;
+        }
+    });
+
+    //设置选项卡切换
+    function setTabs(ops) {
+        return new Tabs(ops);
+    }
+
+    //------------------------- export -------------------------
+
+    Q.Tabs = Tabs;
+    Q.setTabs = setTabs;
 
 })();

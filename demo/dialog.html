@@ -1,0 +1,190 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>弹出框+确认框+输入框</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .w-row { padding: 5px 0; }
+        .w-name { width: 25%; text-align: right; }
+        .w-value { width: 75%; }
+        .w-value input.text { width: 80%; padding: 2px 0 2px 5px; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <div>
+                <div class="inline-block w-button w-blue w-alert">弹出框</div>
+                <div class="inline-block w-button w-green w-confirm">确认框</div>
+                <div class="inline-block w-button w-red w-prompt">输入框</div>
+                <div class="inline-block w-button w-dark w-loading">加载框</div>
+                <div class="inline-block w-button w-light w-custom">自定义弹出框</div>
+                <div class="inline-block w-button w-light w-pos">指定位置显示</div>
+                <div class="inline-block w-button w-light w-auto-height">自动高度弹出框</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/Q.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.Box.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        //弹出框
+        $(".w-alert").click(function () {
+            //第2个和第3个为可选参数，可灵活调用，下同
+            //Q.alert(msg)
+            //Q.alert(msg,fn)
+            //Q.alert(msg,ops)
+            //Q.alert(msg,fn,ops)
+            Q.alert('Hello <span class="hot">World</span>！', function () {
+                //关闭时触发
+                log('弹出框回调函数！');
+            }, {
+                title: "自定义标题",
+                //width: 420,
+                //height:200,
+                //maxHeight:500,         //最大高度，若内容超出高度，将显示滚动条
+                //zIndex:10,
+                mask: true,              //是否显示遮罩层
+                //esc: true,             //是否支持按ESC键退出
+                //center: true,          //是否居中显示
+                //drag: true,            //是否允许拖拽
+                //time: 3000,            //正整数，多少毫秒后自动关闭，若不指定则一直显示
+
+                //remove:移除弹出框
+                //hide:隐藏弹出框，可再次显示
+                close: "remove",         //关闭行为(remove|hide)
+                className: "x-dialog"    //附加的样式名称
+            });
+        });
+
+        //确认框
+        $(".w-confirm").click(function () {
+            Q.confirm('Hello <span class="hot">World</span>？', function (yes) {
+                Q.alert("您选择了：" + (yes ? "yes" : "no"));
+                log('确认框回调函数！' + yes);
+            });
+        });
+
+        //输入框
+        $(".w-prompt").click(function () {
+            Q.prompt('输入IP地址：', function (value) {
+                if (!value || !Q.isIP(value)) return false;
+
+                Q.alert('您输入的IP为：<span class="hot">' + value + '</span>');
+            });
+        });
+
+        //加载框
+        $(".w-loading").click(function () {
+            var f = Q.showLoading(), c = 0;
+
+            var timer = setInterval(function () {
+                if (++c > 5) {
+                    clearInterval(timer);
+                    f.remove();
+                    return;
+                }
+
+                f.setTitle('加载数据 <span class="green">' + (c * 20) + '%</span>')
+            }, 1000)
+        });
+
+        //自定义登录框组件
+        function LoginBox() {
+            var html =
+                '<div class="clearfix w-row">' +
+                    '<div class="fl w-name">用户名：</div>' +
+                    '<div class="fl w-value"><input type="text" class="text x-user" /></div>' +
+                '</div>' +
+                '<div class="clearfix w-row">' +
+                    '<div class="fl w-name">密码：</div>' +
+                    '<div class="fl w-value"><input type="password" class="text x-pwd" /></div>' +
+                '</div>' +
+                //传入1仅显示确定按钮（.x-submit）
+                //传入2显示确定（.x-submit）、取消（.x-cancel）按钮
+                Q.bottom(2);
+
+            var box = Q.WinBox({
+                title: "登录框",
+                html: html,
+                width: 480,
+                mask: true,
+                close: "hide"
+            });
+
+            var inputUser = box.get(".x-user"),
+                inputPwd = box.get(".x-pwd");
+
+            var submit = function () {
+                var user = inputUser.value,
+                    pwd = inputPwd.value;
+
+                if (!user) return Q.setInputError(inputUser);
+                if (!pwd) return Q.setInputError(inputPwd);
+
+                var html =
+                    '登录成功！<br>' +
+                    '用户名为：<span class="green">' + user + '</span>，' +
+                    '密码为：<span class="green">' + pwd + '</span><br>';
+
+                Q.alert(html);
+            };
+
+            box.bind(".x-submit", "click", submit).bind(".x-cancel", "click", "hide");
+
+            //在输入框按Enter键快速提交
+            box.bind([inputUser, inputPwd], "keyup", function (e) {
+                if (e.keyCode == 13) submit();
+                else Q.setInputDefault(this);
+            });
+
+            return box;
+        }
+
+        var login_box = new LoginBox();
+        //默认隐藏登录框
+        login_box.hide();
+
+        //自定义弹出框
+        $(".w-custom").click(function () {
+            login_box.toggle();
+        });
+
+        //指定位置显示
+        $(".w-pos").click(function () {
+            var dialog = Q.alert('右上角显示！', { center: false });
+
+            //dialog.box为弹出框根元素
+            $(dialog.box).css({
+                left: "",
+                top: 20,
+                right: 20
+            });
+        });
+
+        //自动高度弹出框
+        $(".w-auto-height").click(function () {
+            var ops = {
+                maxHeight: Q.view.getHeight() - 100,
+                mask: true
+            };
+
+            Q.alert('弹出框1：未超出高度时不显示滚动条。<br>' + 'This is a test！<br>'.repeat(2), function () {
+                Q.alert('弹出框2：超出高度后显示滚动条。<br>' + 'This is a test！<br>'.repeat(200), ops);
+            }, ops);
+        });
+    </script>
+</body>
+</html>

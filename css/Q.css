@@ -7,6 +7,7 @@ input, select { outline: none; }
 table, img { border: none; }
 table { border-collapse: collapse; border-spacing: 0; }
 
+a { text-decoration: none; }
 a.link { color: #369; }
 a.link:hover { text-decoration: underline; }
 
@@ -15,6 +16,8 @@ a.text { cursor: text; }
 .fl { float: left; }
 .fr { float: right; }
 .clear { clear: both; }
+.clearfix:after { content: ''; display: table; clear: both; }
+.clearfix { zoom: 1; }
 
 .hot { color: red; }
 .green { color: green; }
@@ -143,3 +146,11 @@ a.text { cursor: text; }
 .pager .count, .pager-count { margin-left: 15px; line-height: 24px; }
 .pager .page-size { font-weight: bold; color: red; }
 .pager .total-count { font-weight: bold; color: green; }
+
+/* --------------- 选项卡切换 --------------- */
+.tabTitle li { float: left; margin-right: 4px; position: relative; }
+.tabTitle li a { float: left; padding: 0 18px; border: 1px solid #cdcdcd; border-bottom: none; line-height: 44px; font-size: 14px; color: #333; text-decoration: none; font-weight: bold; }
+.tabTitle li a:hover, .tabTitle li.on a { border-top: 2px solid #ff6600; line-height: 44px; background: #fff; }
+
+.tabCont { margin-top: -1px; padding: 10px; border: 1px solid #cdcdcd; background: #fff; }
+.turn-box { display: none; min-height: 300px; }
