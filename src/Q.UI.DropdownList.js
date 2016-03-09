@@ -3,7 +3,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/11/26 13:04
+* update:2016/03/09 13:09
 */
 (function (undefined) {
     "use strict";
@@ -67,7 +67,7 @@
                         '<div class="arrow arrow-down"></div>' +
                     '</div>' +
                 '</div>' : '') +
-                '<div class="x-panel x-sel-list"></div>';
+                '<div class="x-panel x-sel-list' + (isDropdownList ? '' : ' x-sel-multiple') + '"></div>';
 
             addClass(box, "x-sel");
 

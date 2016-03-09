@@ -17,6 +17,7 @@
     var list_page = [
         { title: "弹出框+确认框+输入框等", href: "dialog.html" },
         { title: "元素拖拽", href: "drag.html" },
+        { title: "下拉框与多选框", href: "dropdownlist.html" },
         { title: "多级右键菜单", href: "contextmenu.html" },
         { title: "颜色选择器", href: "colorpicker.html" },
         { title: "数据分页", href: "pager.html" },

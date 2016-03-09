@@ -1,0 +1,71 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>元素拖拽</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .content { position: relative; }
+
+        .set-color { width: 200px; padding: 5px; }
+        .set-bgcolor { width: 200px; height: 50px; line-height: 50px; padding: 10px; border: 1px solid green; margin: 20px 0; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <div>
+                <input type="text" class="set-color" value="点击设置文本颜色" />
+            </div>
+            <div class="set-bgcolor">点击设置背景颜色</div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/Q.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.ColorPicker.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        //颜色选择器对象
+        var picker = new Q.ColorPicker;
+
+        //设置文本颜色
+        $(".set-color").click(function (e) {
+            var el = this;
+
+            picker.callback = function (color) {
+                el.style.color = color;
+            };
+
+            picker.show(e.x, e.y);
+
+            //此句不可少,否则颜色选择器无法显示,或者调用 e.stopPropagation();
+            return false;
+        });
+
+        //设置背景颜色
+        $(".set-bgcolor").click(function (e) {
+            var el = this;
+
+            picker.callback = function (color) {
+                el.style.backgroundColor = color;
+            };
+
+            picker.show(e.x, e.y);
+
+            //阻止事件冒泡
+            e.stopPropagation();
+        });
+
+    </script>
+</body>
+</html>

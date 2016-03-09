@@ -2,7 +2,7 @@
 /*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2016/02/25 17:24
+* update:2016/03/08 17:16
 */
 (function () {
     "use strict";
@@ -53,9 +53,12 @@
 
         //显示默认的选项卡
         setTimeout(function () {
-            var index = ops.index;
-            if (index == undefined) index = self.map_index[ops.hash || parseHash().nav.slice(1)] || 0;
+            var hash = parseHash().nav.slice(1) || ops.hash,
+                index = self.map_index[hash];
 
+            if (index == undefined) index = ops.index || 0;
+
+            //默认显示顺序 location hash -> html定义(x-def属性) -> ops.index -> 0
             self.showTab(index);
         }, 20);
     }

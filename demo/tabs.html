@@ -1,0 +1,104 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>选项卡切换</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .content { position: relative; }
+        .turn-box { width: 600px; min-height: 200px; _height: 200px; }
+        .text { padding: 20px; width: 500px; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <div>
+                <ul class="tabTitle clearfix">
+                    <li><a href="#tab1">选项卡1</a></li>
+                    <li><a href="#tab2">选项卡2</a></li>
+                    <li><a href="#tab3">选项卡3</a></li>
+                </ul>
+            </div>
+            <div class="tabCont">
+                <div class="turn-box"></div>
+                <div class="turn-box"></div>
+                <div class="turn-box">
+                    <div class="text">
+                        1. border近亲
+                        outline和border是近亲，为什么这么讲呢？首先，都是给元素外面套框框的；其次，支持的属性值几乎都是一样的，例如，outline-style和border-style值dotted, dashed, solid, ...之类的，一些语法也几乎一样。如果这都不算近亲，你让绝对定位和浮动何言以对。<br>
+                        2. IE8+支持
+                        outline严格来讲属于CSS3属性，但是IE8+浏览器就支持了。外挂一句，IE9+浏览器的outline还支持invert，专门针对outline-color. 所以，如果你的项目不用管IE6/IE7浏览器，可以把outline挂在心中，有时候说不定会帮忙。<br>
+                        3. 不占据空间
+                        默认的盒模型下，假设元素100*100像素，我们给元素设置border:10px solid，则实际该元素占据的尺寸至少就是120*120像素，元素的偏移、布局啊什么的，就需要多多思量。但是，outline不一样，你哪怕outline:100px solid，元素占据的尺寸还是100*100像素。这种行为表现，与transform以及box-shadow等CSS3属性很类似，虽然外形丰满了，但是，占据的真实空间没有影响。于是，我们在实现一些交互效果的时候，例如hover变化，我们就可以专注于效果本身，而不用被布局所左右，是很棒的体验。<br>
+                        4. 直角！圆角？
+                        正好承上启下一下。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/Q.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.Box.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.Tabs.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        function init_tab1(box) {
+            var f = Q.showLoading();
+
+            //模拟ajax加载
+            setTimeout(function () {
+                f.remove();
+
+                $(box).html('动态加载数据：<br><span class="green">outline和border是近亲，为什么这么讲呢？首先，都是给元素外面套框框的；其次，支持的属性值几乎都是一样的，例如，outline-style和border-style值dotted, dashed, solid, ...之类的，一些语法也几乎一样。如果这都不算近亲，你让绝对定位和浮动何言以对。</span>');
+            }, 500);
+        }
+
+        function init_tab2(box) {
+            var f = Q.showLoading();
+
+            //模拟ajax加载
+            setTimeout(function () {
+                f.remove();
+
+                $(box).html('动态加载数据：<br><span class="hot">outline严格来讲属于CSS3属性，但是IE8+浏览器就支持了。外挂一句，IE9+浏览器的outline还支持invert，专门针对outline-color. 所以，如果你的项目不用管IE6/IE7浏览器，可以把outline挂在心中，有时候说不定会帮忙。</span>');
+            }, 500);
+        }
+
+        //自定义选项卡切换事件
+        window.onTabChange = function (data) {
+            /*data={
+                index,   //选项卡索引
+                tab,     //tab元素(li)
+                cont,    //cont元素(div.turn-box)
+                loaded   //选项卡是否已加载
+            }*/
+
+            //已加载过的选项卡直接返回
+            if (data.loaded) return;
+
+            var box = data.cont;
+
+            switch (data.index) {
+                case 0: init_tab1(box); break;
+                case 1: init_tab2(box); break;
+            }
+        };
+
+        Q.setTabs({
+            hash: "tab3"  //默认显示的选项卡hash,不带#号
+        });
+    </script>
+</body>
+</html>

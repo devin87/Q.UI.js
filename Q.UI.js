@@ -2,7 +2,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/03/03 17:57
+* update:2016/03/08 15:02
 */
 (function (undefined) {
     "use strict";
@@ -24,9 +24,6 @@
 
         getStyle = Q.getStyle,
         setStyle = Q.setStyle,
-
-        getOffset = Q.offset,
-        //setOffset = getOffset,
 
         getFirst = Q.getFirst,
         getNext = Q.getNext,
@@ -196,6 +193,7 @@
 
                 autoIndex = ops.autoIndex !== false,
                 autoMask = ops.autoMask !== false,
+                autoCursor = ops.autoCursor !== false,
 
                 zIndex = ele.nodeType == 1 ? +getStyle(ele, "z-index") : 0,
 
@@ -219,7 +217,7 @@
 
             //初始化元素状态
             setCssIfNot(ele, "position", "absolute");
-            setCssIfNot(target, "cursor", "move");
+            if (autoCursor) setCssIfNot(target, "cursor", "move");
 
             //设置元素居中
             if (ops.center) {
@@ -382,7 +380,9 @@
 
                 target = ele,
 
-                startX, startY, _isX, _isY;
+                startLeft, startTop,
+
+                startX, startY, movedX, movedY, _isX, _isY;
 
             if (hasShadow) {
                 if (!ELE_DRAG_SHADOW) {
@@ -398,13 +398,16 @@
 
             //实现doDown接口
             base.doDown = function (e) {
-                startX = e.clientX - ele.offsetLeft;
-                startY = e.clientY - ele.offsetTop;
+                startX = e.clientX;
+                startY = e.clientY;
+
+                var offset = hasShadow ? $(ele).offset() : $(ele).position();
+
+                startLeft = offset.left;
+                startTop = offset.top;
 
                 if (hasShadow) {
-                    var offset = getOffset(ele);
-
-                    Object.forEach({ left: offset.left, top: offset.top, width: ele.offsetWidth, height: ele.offsetHeight }, function (key, value) {
+                    Object.forEach({ left: startLeft, top: startTop, width: w, height: h }, function (key, value) {
                         target.style[key] = value + "px";
                     });
 
@@ -417,15 +420,20 @@
                 cssShow(target);
 
                 if (_isX) {
-                    var x = e.clientX - startX;
+                    movedX = e.clientX - startX;
+
+                    var x = startLeft + movedX;
                     if (range) {
                         if (x < range.x) x = range.x;
                         else if (range.w && x + w > range.x + range.w) x = range.x + range.w - w;
                     }
+
                     target.style.left = x + "px";
                 }
                 if (_isY) {
-                    var y = e.clientY - startY;
+                    movedY = e.clientY - startY;
+
+                    var y = startTop + movedY;
                     if (range) {
                         if (y < range.y) y = range.y;
                         else if (range.h && y + h > range.y + range.h) y = range.y + range.h - h;
@@ -436,11 +444,10 @@
 
             if (hasShadow) {
                 base.doUp = function () {
-                    if (isHidden(target)) return;
                     cssHide(target);
 
-                    ele.style.left = target.style.left;
-                    ele.style.top = target.style.top;
+                    ele.style.left = (ele.offsetLeft + movedX) + "px";
+                    ele.style.top = (ele.offsetTop + movedY) + "px";
                 };
             }
 
@@ -1305,7 +1312,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/11/26 13:04
+* update:2016/03/09 13:09
 */
 (function (undefined) {
     "use strict";
@@ -1369,7 +1376,7 @@
                         '<div class="arrow arrow-down"></div>' +
                     '</div>' +
                 '</div>' : '') +
-                '<div class="x-panel x-sel-list"></div>';
+                '<div class="x-panel x-sel-list' + (isDropdownList ? '' : ' x-sel-multiple') + '"></div>';
 
             addClass(box, "x-sel");
 
@@ -1878,7 +1885,7 @@
 ﻿/*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2016/02/25 17:24
+* update:2016/03/08 17:16
 */
 (function () {
     "use strict";
@@ -1929,9 +1936,12 @@
 
         //显示默认的选项卡
         setTimeout(function () {
-            var index = ops.index;
-            if (index == undefined) index = self.map_index[ops.hash || parseHash().nav.slice(1)] || 0;
+            var hash = parseHash().nav.slice(1) || ops.hash,
+                index = self.map_index[hash];
 
+            if (index == undefined) index = ops.index || 0;
+
+            //默认显示顺序 location hash -> html定义(x-def属性) -> ops.index -> 0
             self.showTab(index);
         }, 20);
     }

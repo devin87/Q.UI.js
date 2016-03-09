@@ -125,6 +125,8 @@ a.text { cursor: text; }
 .x-sel-mini .x-sel-arrow { width: 22px; }
 .x-sel-mini .x-sel-arrow .arrow-down { margin: 8px 0 0 5px; }
 
+.x-sel-multiple { z-index: 90; }
+
 /* --------------- 颜色选择器 --------------- */
 .x-picker { position: absolute; width: 231px; border-style: solid; border-color: #000; border-width: 1px 0 0 1px; font-size: 12px; font-family: "宋体", Arial; z-index: 999; }
 .x-picker .xp-title { height: 25px; padding-top: 4px; background: #E4E4E4; border-style: solid; border-color: #000; border-width: 0 1px 1px 0; }
@@ -149,8 +151,8 @@ a.text { cursor: text; }
 
 /* --------------- 选项卡切换 --------------- */
 .tabTitle li { float: left; margin-right: 4px; position: relative; }
-.tabTitle li a { float: left; padding: 0 18px; border: 1px solid #cdcdcd; border-bottom: none; line-height: 44px; font-size: 14px; color: #333; text-decoration: none; font-weight: bold; }
+.tabTitle li a { float: left; padding: 0 18px; border: 1px solid #cdcdcd; border-bottom: none; line-height: 44px; font-size: 14px; color: #333; text-decoration: none; font-weight: bold; cursor: pointer; }
 .tabTitle li a:hover, .tabTitle li.on a { border-top: 2px solid #ff6600; line-height: 44px; background: #fff; }
 
 .tabCont { margin-top: -1px; padding: 10px; border: 1px solid #cdcdcd; background: #fff; }
-.turn-box { display: none; min-height: 300px; }
+.turn-box { display: none; }
