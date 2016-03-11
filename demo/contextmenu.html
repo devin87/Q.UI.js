@@ -50,14 +50,26 @@
                { id: "c1", text: "Cut the file" },
                { id: "c2", text: "Copy from this" },
                { id: "c3", text: "Paste to it" },
-               { id: "c5", text: "Choose paste", group: { width: 220, items: [{ id: "5-1", ico: "", text: "Only paste value" }, { id: "5-2", ico: "", text: "Only Paste format" }, { id: "5-3", ico: "", text: "Only Paste formula" }, { id: "5-4", ico: "", text: "Only Paste style" }, { id: "5-5", ico: "", text: "Only Paste link" }, { id: "5-6", ico: "", text: "Paste all exlude border" }] } },
+               {
+                   id: "c5", text: "Choose paste", group: {
+                       width: 220,
+                       items: [
+                           { id: "5-1", text: "Only paste value" },
+                           { id: "5-2", text: "Only Paste format" },
+                           { id: "5-3", text: "Only Paste formula" },
+                           { id: "5-4", text: "Only Paste style" },
+                           { id: "5-5", text: "Only Paste link" },
+                           { id: "5-6", text: "Paste all exlude border" }
+                       ]
+                   }
+               },
                { id: "c-s1", split: true },
 
-               { id: "c13", ico: "", text: "Clean content" },
-               { id: "c14", ico: "", text: "Clean format" },
-               { id: "c22", ico: "", text: "Clean style" },
+               { id: "c13", text: "Clean content" },
+               { id: "c14", text: "Clean format" },
+               { id: "c22", text: "Clean style" },
 
-               { id: "c11", ico: "", text: "转换为中文菜单" }
+               { id: "c11", text: "转换为中文菜单" }
             ]
         };
 
@@ -73,7 +85,7 @@
                 { id: "2", ico: "<div class=\"x-ico i-copy\"></div>", text: "复制", click: function () { writeLog('您点击了<span class="hot">复制</span>'); } },
                 { id: "3", ico: "<div class=\"x-ico i-paste\"></div>", text: "粘贴", click: function () { writeLog('您点击了<span class="hot">粘贴</span>'); } },
                 {
-                    id: "5", ico: "", text: "选择性粘贴", group: {
+                    id: "5", text: "选择性粘贴", group: {
                         width: 180,
                         items: [
                             { id: "5-1", text: "仅粘贴值" },
@@ -180,7 +192,7 @@
         };
 
         /*------------------- api --------------
-
+        //更改菜单项文本
         cm.setItemText(id, text);
 
         //启用菜单项
