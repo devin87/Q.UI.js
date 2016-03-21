@@ -1,0 +1,11 @@
+﻿@charset "utf-8";
+.header { height: 60px; line-height: 60px; font-size: 16px; text-align: center; border-bottom: 1px solid #ccc; }
+.main { /*overflow: hidden;*/ }
+
+.sidebar { float: left; width: 220px; border-right: 1px solid #ccc; margin-right: 15px; }
+.sidebar .title { font-size: 16px; padding: 8px 0 8px 15px; }
+.sidebar li { padding: 8px 0 8px 35px; border-top: 1px solid #ddd; }
+.sidebar li a { color: #0094ff; font-size: 14px; }
+.sidebar li.on, .sidebar li:hover { background-color: #efefef; }
+
+.content { float: left; min-width: 500px; min-height: 300px; _width: 500px; _height: 300px; padding-top: 20px; }
