@@ -33,10 +33,10 @@
             <iframe id="frame"></iframe>
         </div>
     </div>
-    <div class="w-button w-blue w-box1">元素拖拽-自身拖动</div>
+    <div class="w-button w-blue w-box1">元素拖拽-默认设置</div>
     <div class="w-button w-green w-box2">元素拖拽-阴影框</div>
     <div class="w-button w-red w-box3">元素拖拽-自动居中</div>
-    <div class="w-button w-light w-box5">元素拖拽-不使用遮罩层</div>
+    <div class="w-button w-light w-box5">元素拖拽-在遮罩层上拖动</div>
     <div class="w-box4">
         <span>自定义拖拽-拖拽改变元素大小</span>
         <span class="x-resize"></span>
@@ -76,12 +76,14 @@
         doc.close();
 
         //拖拽调用,以下是默认设置
-        $(".w-box2").drag({
-            autoIndex: true,          //是否自动更新元素z-index,以使拖拽的元素处于最顶层
-            autoMask: true,           //是否创建一个遮罩层,在遮罩层上拖动
+        //相当于 $(".w-box1").drag();
+        $(".w-box1").drag({
+            autoIndex: true,           //是否自动更新元素z-index,以使拖拽的元素处于最顶层
+            autoMask: false,           //是否创建一个遮罩层,在遮罩层上拖动
+            autoCss: true,             //是否自动设置拖拽元素position为absolute
             autoCursor: true,         //是否自动设置拖拽元素cursor样式
             center: false,            //是否将元素居中
-            shadow: true,             //是否创建一个阴影框拖动
+            shadow: false,            //是否创建一个阴影框拖动
             isX: true,                //是否允许在x轴上拖动（左右拖动）
             isY: true,                //是否允许在y轴上拖动（上下拖动）
 
@@ -94,10 +96,9 @@
             }
         });
 
-        $(".w-box1").drag({ shadow: false });
-        //$(".w-box2").drag();
+        $(".w-box2").drag({ shadow: true });
         $(".w-box3").drag({ center: true });
-        $(".w-box5").drag({ shadow: false, autoMask: false });
+        $(".w-box5").drag({ autoMask: true });
 
         //自定义拖拽-拖拽改变元素大小
         new Q.DragX(function () {
