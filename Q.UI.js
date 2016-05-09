@@ -2,7 +2,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/04/05 17:09
+* update:2016/04/09 15:54
 */
 (function (undefined) {
     "use strict";
@@ -587,8 +587,11 @@
                 width = ops.width,
                 height = ops.height,
                 maxHeight = ops.maxHeight,
+                isDrag = ops.drag !== false,
+                isCenter = isDrag && ops.center !== false,
                 className = ops.className;
 
+            self.ops = ops;
             self.callback = ops.callback;
 
             var html =
@@ -610,6 +613,8 @@
             var box = createEle("div", "x-box" + (className ? " " + className : ""), html);
             Q.body.appendChild(box);
 
+            self.box = box;
+
             var zIndex = ops.zIndex || 0;
             if (CURRENT_INDEX > DEF_INDEX) zIndex = Math.max(zIndex, CURRENT_INDEX);
 
@@ -618,25 +623,61 @@
             var boxHead = getFirst(box),
                 boxMain = getNext(boxHead);
 
-            //兼容性考虑,width最好指定固定值
-            if (isUNum(width)) setWidth(box, width);
+            //设置标题
+            self.setTitle = function (title) {
+                $(".x-title", boxHead).html(title);
+                return self;
+            };
 
-            if (maxHeight) {
+            //设置宽度
+            self.setWidth = function (width) {
+                ops.width = width;
+                setWidth(box, width);
+                fire(ops.resize, self);
+
+                return self;
+            };
+
+            //设置高度
+            self.setHeight = function (height) {
+                ops.height = height;
+                setHeight(boxMain, height - boxHead.offsetHeight - 20);
+
+                return self;
+            };
+
+            //设置最大高度,超出后出现滚动条
+            self.setMaxHeight = function (maxHeight) {
+                ops.maxHeight = maxHeight;
+
+                var height = ops.height;
+
                 if (isUNum(height) && height > maxHeight) height = maxHeight;
 
-                if (box.offsetHeight > maxHeight) {
+                if (box.scrollHeight > maxHeight) {
                     height = maxHeight;
 
                     addClass(box, "x-box-auto");
                 }
-            }
 
-            if (isUNum(height)) {
-                if (height > 50) setHeight(boxMain, height - boxHead.offsetHeight - 20);
-            }
+                if (isUNum(height)) self.setHeight(height);
+                if (isCenter) setCenter(box);
+
+                fire(ops.resize, self);
+
+                return self;
+            };
+
+            //兼容性考虑,width最好指定固定值
+            if (isUNum(width)) setWidth(box, width);;
 
             if (boxHead.offsetWidth < 10) setWidth(boxHead, box.offsetWidth);
 
+            //高度设置
+            if (maxHeight) self.setMaxHeight(maxHeight);
+            else if (isUNum(height)) self.setHeight(height);
+
+            //遮罩层
             if (ops.mask) self.mbox = ops.mask == "new" ? new MaskBox() : getMaskBox();
 
             var action_close = ops.close || "hide",
@@ -652,17 +693,17 @@
                 });
             }
 
+            //指定时间后自动关闭弹出框
             var time = ops.time;
             if (isUInt(time)) async(callback_close, time);
 
-            self.box = box;
-
             fire(ops.init, self, box, ops);
 
-            if (ops.drag !== false) {
+            //拖动
+            if (isDrag) {
                 self.dr = setDrag(box, {
                     target: boxHead,
-                    center: ops.center !== false,
+                    center: isCenter,
                     shadow: ops.shadow !== false,
                     autoMask: true,
 
@@ -676,11 +717,6 @@
             }
 
             $(".x-ie-fix", box).width(box.offsetWidth - 2).height(box.offsetHeight - 2);
-
-            //设置标题
-            self.setTitle = function (title) {
-                $(".x-title", boxHead).html(title);
-            };
         });
     }
 
@@ -702,12 +738,17 @@
 
             var oldInit = ops.init;
 
-            ops.init = function (box, ops) {
+            ops.resize = function () {
                 var self = this,
                     contentWidth = self.get(".x-view").offsetWidth - self.get(".x-ico").offsetWidth;
 
-                $(".x-dialog", box).width(contentWidth);
+                $(".x-dialog", self.box).width(contentWidth);
+            };
 
+            ops.init = function (box, ops) {
+                var self = this;
+
+                ops.resize.call(self);
                 fire(oldInit, self, box, ops);
             };
         } else {
