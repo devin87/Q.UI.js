@@ -22,7 +22,8 @@
         { title: "颜色选择器", href: "colorpicker.html" },
         { title: "数据分页", href: "pager.html" },
         { title: "选项卡切换", href: "tabs.html" },
-        { title: "进度条", href: "progressbar.html" }
+        { title: "进度条", href: "progressbar.html" },
+        { title: "图片、内容无缝滚动", href: "marquee.html" }
     ];
 
     var map_page = {};

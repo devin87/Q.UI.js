@@ -156,3 +156,8 @@ a.text { cursor: text; }
 
 .tabCont { margin-top: -1px; padding: 10px; border: 1px solid #cdcdcd; background: #fff; }
 .turn-box { display: none; }
+
+/* --------------- 无缝滚动 --------------- */
+.slide-box { position: relative; z-index: 1; overflow: hidden; }
+.slide-ul { width: 100%; height: 100%; position: relative; z-index: 1; }
+.slide-li { width: 100%; height: 100%; position: absolute; top: 0; z-index: 1; }
