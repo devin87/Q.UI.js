@@ -1,0 +1,138 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>元素拖拽</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .content { position: relative; }
+        .w-button { margin-right: 5px; }
+        .w-row { padding: 5px 0; }
+        .w-name { width: 25%; text-align: right; }
+        .w-value { width: 75%; }
+        .w-value input.text { width: 80%; padding: 2px 0 2px 5px; }
+
+        .w-box1, .w-box2, .w-box3, .w-box4, .w-box5 { position: absolute; top: 80px; }
+        .w-box1 { left: 260px; }
+        .w-box2 { left: 420px; }
+        .w-box5 { left: 560px; }
+
+        .w-box4 { width: 200px; height: 80px; top: 120px; left: 600px; border: 1px solid #ccc; padding: 10px; }
+        .x-resize { position: absolute; width: 6px; height: 6px; right: -3px; bottom: -3px; border: 1px solid green; background: #fff; cursor: se-resize; }
+
+        #frame { width: 300px; height: 300px; border: 1px solid green; margin: 50px; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <iframe id="frame"></iframe>
+        </div>
+    </div>
+    <div class="w-button w-blue w-box1">元素拖拽-默认设置</div>
+    <div class="w-button w-green w-box2">元素拖拽-阴影框</div>
+    <div class="w-button w-red w-box3">元素拖拽-自动居中</div>
+    <div class="w-button w-light w-box5">元素拖拽-在遮罩层上拖动</div>
+    <div class="w-box4">
+        <span>自定义拖拽-拖拽改变元素大小</span>
+        <span class="x-resize"></span>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/Q.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.Box.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        var frame = document.getElementById("frame"),
+            doc = frame.contentWindow.document;
+
+        doc.open();
+
+        var html =
+            '<!doctype html>' +
+            '<html>' +
+            '<head>' +
+                '<style type="text/css">' +
+                    'html,body{margin:0;padding:0;}' +
+                    'body{height:300px;}' +
+                '</style>' +
+            '</head>' +
+            '<body>' +
+                '我是iframe，你怕不怕！<br>' +
+                '如果拖拽未做处理，在iframe上拖动时容易丢失焦点，无法捕获鼠标释放事件！' +
+            '</body>' +
+            '</html>';
+
+        doc.write(html);
+        doc.close();
+
+        //拖拽调用,以下是默认设置
+        //相当于 $(".w-box1").drag();
+        $(".w-box1").drag({
+            autoIndex: true,           //是否自动更新元素z-index,以使拖拽的元素处于最顶层
+            autoMask: false,           //是否创建一个遮罩层,在遮罩层上拖动
+            autoCss: true,             //是否自动设置拖拽元素position为absolute
+            autoCursor: true,         //是否自动设置拖拽元素cursor样式
+            center: false,            //是否将元素居中
+            shadow: false,            //是否创建一个阴影框拖动
+            isX: true,                //是否允许在x轴上拖动（左右拖动）
+            isY: true,                //是否允许在y轴上拖动（上下拖动）
+
+            //允许拖动的范围
+            range: {
+                x: 0,           //初始x坐标
+                y: 0,           //初始y坐标
+                w: undefined,   //宽度
+                h: undefined    //高度
+            }
+        });
+
+        $(".w-box2").drag({ shadow: true });
+        $(".w-box3").drag({ center: true });
+        $(".w-box5").drag({ autoMask: true });
+
+        //自定义拖拽-拖拽改变元素大小
+        new Q.DragX(function () {
+            var base = this,
+                boxView = $(".w-box4")[0],  //要改变大小的元素
+                ele = $(".x-resize")[0],    //拖拽元素
+
+                startWidth,  //初始宽度
+                startHeight, //初始高度
+
+                startX,      //初始x坐标
+                startY;      //初始y坐标
+
+            //实现ops接口
+            base.ops = { ele: ele, autoCursor: false };
+
+            //实现doDown接口
+            base.doDown = function (e) {
+                startX = e.clientX;
+                startY = e.clientY;
+
+                startWidth = $(boxView).width();
+                startHeight = $(boxView).height();
+            };
+
+            //实现doMove接口
+            base.doMove = function (e) {
+                var x = e.clientX - startX,  //水平移动的距离
+                    y = e.clientY - startY;  //垂直移动的距离
+
+                $(boxView).width(startWidth + x).height(startHeight + y);
+            };
+        });
+
+    </script>
+</body>
+</html>

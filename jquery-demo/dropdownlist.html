@@ -1,0 +1,141 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>下拉菜单</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .content { position: relative; }
+        .w-button { margin-right: 5px; }
+
+        .view { width: 400px; }
+        .log { width: 300px; padding: 10px; }
+
+        .info { padding: 10px; }
+        .sel1, .sel2 { width: 200px; }
+
+        .toolbar { margin-bottom: 10px; }
+
+        /*多选框最大高度，超出后出现滚动条*/
+        .sel2 .x-sel-list { max-height: 300px; }
+
+        .mt30 { margin-top: 30px; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <div class="fl view">
+                <p class="info">1. 下拉框</p>
+                <div class="toolbar">
+                    <div class="inline-block w-button w-blue w-submit1">获取选中项的值</div>
+                    <div class="inline-block w-button w-green w-select1">选中4</div>
+                </div>
+                <div class="sel1"></div>
+
+                <p class="info mt30">2. 多选框，支持Ctrl、Shift按键选择</p>
+                <div class="toolbar">
+                    <div class="inline-block w-button w-blue w-submit2">获取选中项的值</div>
+                    <div class="inline-block w-button w-green w-select2">选中4和5</div>
+                    <div class="inline-block w-button w-red w-clear2">清除选中项</div>
+                </div>
+                <div class="sel2"></div>
+            </div>
+
+            <div class="fl log"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/jquery-1.12.0.js"></script>
+    <script type="text/javascript" src="../lib/Q.mini.js"></script>
+    <script type="text/javascript" src="../src/adapter/jquery.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.DropdownList.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        function writeLog(msg) {
+            $(".log")[0].innerHTML += (msg || '') + '<br>';
+        }
+
+        //创建一个下拉框
+        var d1 = new Q.DropdownList({
+            box: $$(".sel1")[0],
+            value: 1
+        });
+
+        //创建一个多选框
+        var d2 = new Q.DropdownList({
+            box: $$(".sel2")[0],
+            multiple: true,
+            value: 2
+        });
+
+        d1.add("选择Web连接1", -1);
+        d2.add("选择Web连接2", -1);
+
+        for (var i = 1; i < 7; i++) {
+            d1.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 1 });
+            d2.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 1 });
+        }
+
+        d1.init();
+        d2.init();
+
+        d1.onchange = function (item, index) {
+            /*
+             item = {
+                text,      //选择项的文本（可能是html文本）
+                value,     //选择项的值
+                index,     //选择项的索引
+                node,      //选择项元素(div.x-item)
+                disabled   //该项是否已禁用
+            };
+            */
+            writeLog('[下拉框] 已选择：' + item.text.htmlDecode());
+        };
+
+        //--------------------- 下拉框 ---------------------
+
+        //获取选中项的值
+        $(".w-submit1").click(function () {
+            //d1.text   =>  选中项的文本
+            //d1.value  =>  选中项的值
+            writeLog('[下拉框] 已选择：' + d1.value);
+        });
+
+        //选中4
+        $(".w-select1").click(function () {
+            d1.select(4);
+        });
+
+        //--------------------- 多选框 ---------------------
+
+        //获取选中项的值
+        $(".w-submit2").click(function () {
+            //d2.selectedItems => item数组
+            writeLog('[多选框] 已选择：' + d2.selectedItems.items("value"));
+        });
+
+        //清除选中项
+        $(".w-clear2").click(function () {
+            d2.clearSelect();
+        });
+
+        //选中4和5
+        $(".w-select2").click(function () {
+            d2.select(4).select(5);
+        });
+
+
+    </script>
+</body>
+</html>

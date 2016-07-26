@@ -1,0 +1,74 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>进度条</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .content { position: relative; }
+        .pg .inline-block { vertical-align: middle; }
+        .pg-bar { width: 450px; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <p>根据进度修改速度和更新时间，可实现进度条由快到慢等特殊控制。具体使用可参看源码。</p>
+            <p>此处当进度达到80和90时，会降低进度条速度。</p>
+            <div class="pg">
+                <div class="inline-block pg-bar"></div>
+                <div class="inline-block pg-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/jquery-1.12.0.js"></script>
+    <script type="text/javascript" src="../lib/Q.mini.js"></script>
+    <script type="text/javascript" src="../src/adapter/jquery.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.Progressbar.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        var pgb = new Q.Progressbar({
+            box: $$(".pg-bar")[0],
+
+            //speed: 1,            //速度(0-100)
+            //wait: 100,           //每隔多长时间更新一次进度(ms)
+
+            onprogress: function (progress, speed, time) {
+                $(".pg-text").html(progress.toFixed(1) + "%");
+
+                //根据进度修改速度和更新时间，可实现进度条由快到慢等特殊控制
+                if (progress > 90) {
+                    //降低速度和更新时间
+                    if (speed == 0.5) this.set(0.4, 200);
+                } else if (progress > 80) {
+                    //速度减半
+                    if (speed == 1) this.set(0.5);
+                }
+            }
+        });
+
+        //启动进度条
+        pgb.start();
+
+        //停止进度条
+        //pgb.stop();
+
+        //重新启动进度条(进度归0)
+        //pgb.restart();
+
+        //设置速度和等待时间
+        //pgb.set(speed, wait)
+    </script>
+</body>
+</html>

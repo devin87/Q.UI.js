@@ -1,0 +1,109 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>数据分页</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .content { position: relative; }
+
+        .view { margin: 10px; padding: 10px; width: 700px; border: 1px solid #ccc; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <div class="view">
+                <div class="v-grid"></div>
+                <div class="pager"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/jquery-1.12.0.js"></script>
+    <script type="text/javascript" src="../lib/Q.mini.js"></script>
+    <script type="text/javascript" src="../src/adapter/jquery.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.DataPager.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        var pager = new Q.DataPager({
+            size: 10,              //页码数量
+            pageSize: 10,          //每页显示的数据条数
+            boxNav: $(".pager"),   //页码显示区域
+            showSize: true,        //是否显示记录条数
+            //href: "",
+            page: request["page"] || +location.hash.slice(5),  //初始页码
+
+            //自定义记录条数显示函数，需showSize为true
+            //drawSize: function (self, html_page, html_count) { },
+
+            //绘制函数
+            draw: function (list) {
+                var html =
+                    '<table class="table">' +
+                        '<tr>' +
+                            '<td style="width:25%;">ID</td>' +
+                            '<td>Value</td>' +
+                        '</tr>' +
+                        list.map(function (data) {
+                            var html_row =
+                                '<tr>' +
+                                    '<td>' + data.id + '</td>' +
+                                    '<td>' + data.value + '</td>' +
+                                '</tr>';
+
+                            return html_row;
+                        }).join('') +
+                    '</table>';
+
+                $(".v-grid").html(html)
+            },
+            //加载数据
+            load: function (page, callback) {
+                //模拟数据
+                var list = [];
+                for (var i = 1; i <= 10; i++) list.push({ id: i + (page - 1) * 10, value: "This is a test" + i + ", page: " + page });
+                callback({ totalCount: 325, data: list });
+
+                //ajax远程加载数据
+                //$.getJSON(url, { page: page }, function (data) {
+                //    var list = data.data || [];
+                //    callback({ totalCount: data.total, data: list });
+                //});
+            }
+        });
+
+        //页码改变时触发
+        pager.onchange = function (page) {
+            location.hash = "page" + page;
+        };
+
+        //跳转到指定页
+        //forced:是否强制跳转
+        //pager.go(page, forced);
+
+        //加载并渲染数据
+        //pager.load(page);
+
+        //重新载入指定或当前页数据并渲染
+        //pager.reload(page);
+
+        //设置总的数据条数和每页显示的数据条数
+        //pager.set(totalCount, pageSize);
+
+        //设置数据列表
+        //pager.setData(data);
+
+    </script>
+</body>
+</html>

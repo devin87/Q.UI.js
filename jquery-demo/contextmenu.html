@@ -1,0 +1,245 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>多级右键菜单</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .content { position: relative; }
+        .area { width: 400px; height: 150px; line-height: 150px; text-align: center; border: 1px solid green; margin: 10px 0; }
+        .log { padding: 10px; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <div class="area a1">右键单击区域-同样的菜单表现1</div>
+            <div class="area a2">右键单击区域-同样的菜单表现2</div>
+            <div class="log"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/jquery-1.12.0.js"></script>
+    <script type="text/javascript" src="../lib/Q.mini.js"></script>
+    <script type="text/javascript" src="../src/adapter/jquery.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.ContextMenu.js"></script>
+    <!--引入 Q.UI.ColorPicker.js 用于演示链接菜单-->
+    <script type="text/javascript" src="../src/Q.UI.ColorPicker.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        function writeLog(msg) {
+            $(".log")[0].innerHTML += (msg || '') + '<br>';
+        }
+
+        var colorpicker = new Q.ColorPicker;
+
+        var data2 = {
+            width: 180,
+            rangeX: Q.view.getScrollWidth(),
+            rangeY: Q.view.getScrollHeight(),
+
+            items: [
+               { id: "c1", text: "Cut the file" },
+               { id: "c2", text: "Copy from this" },
+               { id: "c3", text: "Paste to it" },
+               {
+                   id: "c5", text: "Choose paste", group: {
+                       width: 220,
+                       items: [
+                           { id: "5-1", text: "Only paste value" },
+                           { id: "5-2", text: "Only Paste format" },
+                           { id: "5-3", text: "Only Paste formula" },
+                           { id: "5-4", text: "Only Paste style" },
+                           { id: "5-5", text: "Only Paste link" },
+                           { id: "5-6", text: "Paste all exlude border" }
+                       ]
+                   }
+               },
+               { id: "c-s1", split: true },
+
+               { id: "c13", text: "Clean content" },
+               { id: "c14", text: "Clean format" },
+               { id: "c22", text: "Clean style" },
+
+               { id: "c11", text: "转换为中文菜单" }
+            ]
+        };
+
+        //var cm2 = new Q.ContextMenu(data2);
+
+        var data1 = {
+            width: 220,           //菜单宽度
+            //maxHeight: 300,     //菜单最大高度，超出后出现滚动条
+            className: "xp1",
+
+            items: [
+                { id: "1", ico: "<div class=\"x-ico i-cut\"></div>", text: "剪切", click: function () { writeLog('您点击了<span class="hot">剪切</span>'); } },
+                { id: "2", ico: "<div class=\"x-ico i-copy\"></div>", text: "复制", click: function () { writeLog('您点击了<span class="hot">复制</span>'); } },
+                { id: "3", ico: "<div class=\"x-ico i-paste\"></div>", text: "粘贴", click: function () { writeLog('您点击了<span class="hot">粘贴</span>'); } },
+                {
+                    id: "5", text: "选择性粘贴", group: {
+                        width: 180,
+                        items: [
+                            { id: "5-1", text: "仅粘贴值" },
+                            { id: "5-2", text: "仅粘贴格式" },
+                            { id: "5-3", text: "仅粘贴公式" },
+                            { id: "5-4", text: "仅粘贴样式" },
+                            { id: "5-5", text: "仅粘贴链接" },
+                            { id: "5-6", text: "除边框外的所有内容" }
+                        ]
+                    }
+                },
+
+                //split为true表示分隔线
+                { id: "s1", split: true },
+
+                {
+                    id: "7", ico: "<div class=\"x-ico i-insert\"></div>", text: "插入", group: {
+                        width: 160,
+                        items: [
+                            { id: "7-1", text: "插入整行" },
+                            { id: "7-2", text: "插入整列" },
+                            { id: "7-3", text: "活动单元格右移" },
+                            { id: "7-4", text: "活动单元格下移" }
+                        ]
+                    }
+                },
+
+                {
+                    id: "10", ico: "<div class=\"x-ico i-del\"></div>", text: "删除", group: {
+                        width: 160,
+                        items: [
+                            { id: "10-1", text: "删除整行" },
+                            { id: "10-2", text: "删除整列" },
+                            { id: "10-3", text: "右侧单元格左移" },
+                            { id: "10-4", text: "下方单元格上移" }
+                        ]
+                    }
+                },
+
+                { id: "s2", split: true },
+
+                { id: "55", ico: "", text: "自定义操作", group: data2 },
+                { id: "56", text: "链接菜单-颜色选择器", group: colorpicker },
+
+                { id: "s3", split: true },
+
+
+                { id: "15", ico: "../images/Q/alert.gif", text: "插入批注", disabled: true },
+                { id: "16", ico: "../images/Q/loading.gif", text: "设置单元格格式" },
+                { id: "17", text: "命名此区域", disabled: true },
+                { id: "s5", split: true },
+
+                { id: "18", text: "筛选", disabled: true },
+                {
+                    id: "19", text: "排序", disabled: true, group: {
+                        width: 120,
+                        items: [
+                            { id: "19-1", text: "升序" },
+                            { id: "19-2", text: "降序" },
+                            { id: "19-2", text: "自定义排序" }
+                        ]
+                    }
+                },
+
+            ]
+        };
+
+        var cm = new Q.ContextMenu(data1, {
+            //subMenu: false,
+            rangeX: Q.view.getScrollWidth(),
+            rangeY: Q.view.getScrollHeight(),
+            fixedWidth: true
+        });
+
+        //通用点击事件
+        cm.onclick = function (e, item) {
+            //item = {
+            //    data: { id,ico,text },   //传入的数据
+            //    i: 0,                    //菜单索引
+            //    j: 0,                    //菜单项索引
+            //    node                     //菜单项元素(div.x-item)
+            //};
+
+            if (!item.data) return;
+
+            var data = item.data;
+
+            //可针对id做单独处理
+            //switch (data.id) {
+
+            //}
+
+            writeLog('来自通用处理：' + JSON.stringify({ id: data.id, text: data.text }));
+        };
+
+        //通用鼠标移入事件
+        cm.onmouseover = function (e, item) {
+
+        };
+
+        //通用鼠标移出事件
+        cm.onmouseout = function (e, item) {
+
+        };
+
+        /*------------------- api --------------
+        //更改菜单项文本
+        cm.setItemText(id, text);
+
+        //启用菜单项
+        cm.enableItems(ids);
+
+        //禁用菜单项
+        cm.disableItems(ids);
+
+        //显示菜单项
+        cm.showItems(ids);
+
+        //隐藏菜单项
+        cm.hideItems(ids);
+
+        //显示菜单
+        cm.show(x,y);
+
+        //隐藏菜单
+        cm.hide();
+
+        //自动切换显示或隐藏
+        cm.toggle(x, y);
+
+        //菜单是否为隐藏状态
+        cm.isHidden();
+
+        //注销菜单
+        cm.destroy();
+
+        */
+
+        //注册右键菜单
+        $(".area").on("contextmenu", function (e) {
+            //可根据不同的项目显示或启用不同的菜单
+            if (this.className.contains("a1")) {
+                cm.showItems(["s3", "15", "16", "17", "s5", "18", "19"]).enableItems(["3", "5"]);
+            } else {
+                cm.hideItems(["s3", "15", "16", "17", "s5", "18", "19"]).disableItems(["3", "5"]);
+            }
+            
+            cm.show(e.pageX, e.pageY);
+
+            return false;
+        });
+
+    </script>
+</body>
+</html>

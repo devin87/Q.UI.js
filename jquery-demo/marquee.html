@@ -1,0 +1,161 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>图片无缝滚动</title>
+    <link href="../css/Q.css" rel="stylesheet" type="text/css" />
+    <link href="demo.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        .content { position: relative; }
+
+        .slide1, .slide2, .slide3 { position: relative; margin-bottom: 20px; }
+        .slide1 .slide-box, .slide3 .slide-box { width: 600px; height: 300px; }
+
+        .prev, .next { position: absolute; top: 50%; margin-top: -16px; padding: 10px; font-size: 32px; color: #fff; display: block; z-index: 20; cursor: pointer; }
+        .next { right: 0; }
+        .prev:hover, .next:hover { color: green; background: #ccc; opacity: 0.8; }
+
+        .slide-control { position: absolute; bottom: 10px; width: 100%; text-align: center; z-index: 20; }
+        .slide-control a { display: inline-block; width: 40px; height: 5px; background: #828bc5; margin: 0 5px; }
+        .slide-control .slide-on { background: #e05a00; }
+
+
+        .slide2 .slide-box { width: 570px; height: 260px; }
+        .slide2 .prev, .slide2 .next { color: green; margin-top: -56px; }
+        .slide2 .slide-li li { float: left; margin-right: 10px; }
+        .slide2 .slide-li li.last { margin-right: 0; }
+        .slide2 .slide-li img { width: 135px; height: 200px; }
+        .slide2 .slide-li .name { text-align: center; }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="header">Header</div>
+    <div class="main">
+        <div id="sidebar" class="sidebar"></div>
+        <div class="content">
+            <div class="slide1">
+                <div class="slide-box">
+                    <ul class="slide-ul">
+                        <li class="slide-li"><img src="http://img1.gtimg.com/16/1686/168686/16868636_1200x1000_0.jpg" /></li>
+                        <li class="slide-li"><img src="http://img1.gtimg.com/16/1686/168686/16868632_1200x1000_0.jpg" /></li>
+                        <li class="slide-li"><img src="http://img1.gtimg.com/16/1686/168686/16868631_1200x1000_0.jpg" /></li>
+                        <li class="slide-li"><img src="http://img1.gtimg.com/16/1686/168686/16868620_1200x1000_0.jpg" /></li>
+                    </ul>
+                    <a class="prev">PREV</a>
+                    <a class="next">NEXT</a>
+                    <div class="slide-control"></div>
+                </div>
+            </div>
+
+            <div class="slide2">
+                <div class="slide-box">
+                    <ul class="slide-ul">
+                        <li class="slide-li">
+                            <ul>
+                                <li>
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2357111716.jpg" /></div>
+                                    <div class="name">忍者神龟2：破...</div>
+                                </li>
+                                <li>
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2361644304.jpg" /></div>
+                                    <div class="name">快手枪手快枪手...</div>
+                                </li>
+                                <li>
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2367899630.jpg" /></div>
+                                    <div class="name">恐怖爱情故事之...</div>
+                                </li>
+                                <li class="last">
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2358403173.jpg" /></div>
+                                    <div class="name">赏金猎人</div>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="slide-li">
+                            <ul>
+                                <li>
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2366057661.jpg" /></div>
+                                    <div class="name">绝地逃亡</div>
+                                </li>
+                                <li>
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2367559705.jpg" /></div>
+                                    <div class="name">泰山归来：险战...</div>
+                                </li>
+                                <li>
+                                    <div class="img"><img src="https://img1.doubanio.com/view/movie_poster_cover/mpst/public/p2366428288.jpg" /></div>
+                                    <div class="name">哆啦A梦：新·...</div>
+                                </li>
+                                <li class="last">
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2363294351.jpg" /></div>
+                                    <div class="name">天亮之前</div>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="slide-li">
+                            <ul>
+                                <li>
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2360072346.jpg" /></div>
+                                    <div class="name">寒战2</div>
+                                </li>
+                                <li>
+                                    <div class="img"><img src="https://img3.doubanio.com/view/movie_poster_cover/mpst/public/p2361744534.jpg" /></div>
+                                    <div class="name">大鱼海棠</div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <a class="prev">PREV</a>
+                    <a class="next">NEXT</a>
+                    <div class="slide-control"></div>
+                </div>
+            </div>
+
+            <div class="slide3">
+                <div class="slide-box">
+                    <ul class="slide-ul">
+                        <li class="slide-li"><img src="http://img1.gtimg.com/16/1686/168686/16868636_1200x1000_0.jpg" /></li>
+                        <li class="slide-li"><img src="http://img1.gtimg.com/16/1686/168686/16868632_1200x1000_0.jpg" /></li>
+                        <li class="slide-li"><img src="http://img1.gtimg.com/16/1686/168686/16868631_1200x1000_0.jpg" /></li>
+                        <li class="slide-li"><img src="http://img1.gtimg.com/16/1686/168686/16868620_1200x1000_0.jpg" /></li>
+                    </ul>
+                    <a class="prev">PREV</a>
+                    <a class="next">NEXT</a>
+                    <div class="slide-control"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript" src="demo.js"></script>
+
+    <script type="text/javascript" src="../lib/jquery-1.12.0.js"></script>
+    <script type="text/javascript" src="../lib/Q.mini.js"></script>
+    <script type="text/javascript" src="../src/adapter/jquery.js"></script>
+    <script type="text/javascript" src="../src/Q.UI.Marquee.js"></script>
+
+    <script type="text/javascript">
+        function log() {
+            if (window.console) console.log.apply(console, arguments);
+        }
+
+        $(".slide-box").each(function (i, box) {
+            new Q.Marquee({
+                box: box,                       //顶层DOM对象，下列ul、boxControl等都基于此对象
+                ul: ".slide-ul",                //要滚动的ul对象
+                boxControl: ".slide-control",   //下方滚动按钮容器，可选
+                btnPrev: ".prev",               //向左滚动按钮
+                btnNext: ".next",               //向右滚动按钮
+                way: i == 2 ? "top" : "left",   //滚动方向，top:上下滚动，left:左右滚动，默认left
+
+                sleep: 5000,                    //自动滚动的时间间隔（ms）
+
+                isSlideKeydown: true,           //是否允许键盘（左右方向键）控制滚动，默认为true
+                isStoppedHover: true,           //鼠标移上去时停止自动滚动，移出时开始自动滚动，默认为true
+
+                auto: true                      //是否自动滚动
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 # Q.UI.js
-基于Q.js的UI库，包括遮罩层、弹出框、下拉列表、右键菜单、颜色选择器、选项卡、进度条、数据分页等。
+基于Q.js的UI库，包括遮罩层、弹出框、下拉列表、右键菜单、颜色选择器、选项卡、进度条、数据分页、无缝滚动等。
 
 具体使用参见demo
 
@@ -230,4 +230,23 @@ pager.onchange = function (page) {
 
 //设置数据列表
 //pager.setData(data);
+```
+
+###无缝滚动
+```js
+new Q.Marquee({
+    box: ".slide-box",              //顶层DOM对象，下列ul、boxControl等都基于此对象
+    ul: ".slide-ul",                //要滚动的ul对象
+    boxControl: ".slide-control",   //下方滚动按钮容器，可选
+    btnPrev: ".prev",               //向左滚动按钮
+    btnNext: ".next",               //向右滚动按钮
+    way: i == 2 ? "top" : "left",   //滚动方向，top:向上滚动，left:向左滚动，默认left
+
+    sleep: 5000,                    //自动滚动的时间间隔（ms）
+
+    isSlideKeydown: true,           //是否允许键盘（左右方向键）控制滚动，默认为true
+    isStoppedHover: true,           //鼠标移上去时停止自动滚动，移出时开始自动滚动，默认为true
+
+    auto: true                      //是否自动滚动
+});
 ```
