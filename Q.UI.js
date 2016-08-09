@@ -1929,7 +1929,7 @@
 ﻿/*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2016/03/08 17:16
+* update:2016/08/09 12:00
 */
 (function () {
     "use strict";
@@ -1971,6 +1971,8 @@
 
         //选项卡点击事件
         tabs.forEach(function (el, i) {
+            if ($(el).hasClass("skip")) return;
+
             $(el).click(function () {
                 self.showTab(i);
             });

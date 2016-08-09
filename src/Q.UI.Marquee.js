@@ -3,7 +3,7 @@
 * Q.UI.Marquee.js 无缝滚动插件
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/07/26 17:22
+* update:2016/08/01 13:51
 */
 (function (undefined) {
     "use strict";
@@ -134,7 +134,7 @@
             }
 
             //鼠标放在banner上时暂停播放，移除后继续
-            if (self.isStoppedHover) {
+            if (self.auto && self.isStoppedHover) {
                 self._$ul.hover(function () {
                     self.stop();
                 }, function () {
