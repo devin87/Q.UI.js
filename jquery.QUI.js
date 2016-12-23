@@ -1553,7 +1553,7 @@
 ﻿/*
 * Q.core.js (包括 通用方法、JSON、Cookie、Storage 等) for browser
 * author:devin87@qq.com  
-* update:2016/08/01 14:49
+* update:2016/12/23 15:25
 */
 (function (undefined) {
     "use strict";
@@ -1568,7 +1568,6 @@
         extend = Q.extend,
 
         fire = Q.fire,
-        async = Q.async,
 
         waitFor = Q.waitFor;
 
@@ -1678,7 +1677,7 @@
     //获取页名称
     //keepQueryHash:是否保留查询字符串和Hash字符串
     function get_page_name(path, keepQueryHash) {
-        var pathname = (path || location.pathname).toLowerCase().replace(/\\/g, "/"),
+        var pathname = (path || location.pathname).replace(/\\/g, "/"),
             start = pathname.lastIndexOf("/") + 1;
 
         if (keepQueryHash) return pathname.slice(start);
@@ -2209,7 +2208,7 @@
 
     //确保 document.body 已就绪
     if (document.body) init();
-    else async(init, 0);
+    else waitFor(function () { return document.body; }, init);
 
     //暴露接口
     window.request = parse_url_params(location.search);
@@ -2291,7 +2290,7 @@
 ﻿/*
 * Q.UI.adapter.jquery.js
 * author:devin87@qq.com  
-* update:2015/07/15 11:43
+* update:2016/12/23 15:25
 */
 (function (undefined) {
     "use strict";
@@ -2303,122 +2302,9 @@
         isArrayLike = Q.isArrayLike,
 
         extend = Q.extend,
-        async = Q.async,
-        makeArray = Q.makeArray;
+        makeArray = Q.makeArray,
 
-    //---------------------- core.js ----------------------
-
-    var document = window.document,
-
-        html = document.documentElement,
-        head = document.head || document.getElementsByTagName("head")[0],
-
-        is_quirk_mode = document.compatMode == "BackCompat",
-
-        body,
-        root;
-
-    //清除文本选区
-    function clearSelection() {
-        if (window.getSelection) {
-            var sel = getSelection();
-            if (sel.removeAllRanges) sel.removeAllRanges();
-            else if (sel.empty) sel.empty();    //old chrome and safari
-        } else if (document.selection) {   //ie
-            document.selection.empty();
-        }
-    }
-
-    function init() {
-        Q.body = body = document.body;
-        Q.root = root = is_quirk_mode ? body : html;
-    }
-
-    //确保 document.body 已就绪
-    if (document.body) init();
-    else async(init, 0);
-
-    //----------------------- view -----------------------
-
-    //页面视图
-    var view = {
-        //获取可用宽高
-        getSize: function () {
-            return { width: root.clientWidth, height: root.clientHeight };
-        },
-        //获取可用宽度
-        getWidth: function () {
-            return root.clientWidth;
-        },
-        //获取可用高度
-        getHeight: function () {
-            return root.clientHeight;
-        },
-        //获取页面宽度(包括滚动条)
-        getScrollWidth: function () {
-            //fix webkit bug:document.documentElement.scrollWidth等不能准确识别
-            return Math.max(html.scrollWidth, body.scrollWidth);
-        },
-        //获取页面高度(包括滚动条)
-        getScrollHeight: function () {
-            //fix webkit bug
-            return Math.max(html.scrollHeight, body.scrollHeight);
-        },
-        //获取左边的滚动距离
-        getScrollLeft: function () {
-            //fix webkit bug
-            return html.scrollLeft || body.scrollLeft;
-        },
-        //获取上边的滚动距离
-        getScrollTop: function () {
-            //fix webkit bug
-            return html.scrollTop || body.scrollTop;
-        }
-    };
-
-    extend(Q, {
-        html: html,
-        head: head,
-        quirk: is_quirk_mode,
-
-        clearSelection: clearSelection,
-
-        view: view
-    });
-
-    //---------------------- browser.js ----------------------
-
-    var browser_ie,
-        engine_name = "unknown",
-        engine = {};
-
-    //ie11 开始不再保持向下兼容(例如,不再支持 ActiveXObject、attachEvent 等特性)
-    if (window.ActiveXObject || window.msIndexedDB) {
-        //window.ActiveXObject => ie10-
-        //window.msIndexedDB   => ie11+
-
-        engine.ie = browser_ie = document.documentMode || (!!window.XMLHttpRequest ? 7 : 6);
-        engine["ie" + (browser_ie < 6 ? 6 : browser_ie)] = true;
-
-        engine_name = "trident";
-    } else if (window.opera) {
-        engine_name = "opera";
-    } else if (window.mozInnerScreenX != undefined || isFunc(document.getBoxObjectFor)) {
-        //document.getBoxObjectFor => firefox3.5-
-        //window.mozInnerScreenX   => firefox3.6+
-        engine_name = "gecko";
-    } else if (window.WebKitPoint || window.devicePixelRatio) {
-        //window.WebKitPoint => chrome8+
-        engine_name = "webkit";
-    }
-
-    engine[engine_name] = true;
-
-    extend(Q, engine);
-
-    engine.name = engine_name;
-
-    Q.engine = engine;
+        view = Q.view;
 
     //---------------------- event.js ----------------------
 
@@ -2750,7 +2636,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/04/09 15:54
+* update:2016/12/21 17:08
 */
 (function (undefined) {
     "use strict";
@@ -3452,7 +3338,7 @@
                 self.dr = setDrag(box, {
                     target: boxHead,
                     center: isCenter,
-                    shadow: ops.shadow !== false,
+                    shadow: ops.shadow,
                     autoMask: true,
 
                     //1.由于拖动会创建一个遮罩层,点击关闭时不会触发 .x-close 的click事件,此处检查点击元素,只有非 .x-close 元素才会执行拖动操作
@@ -4677,7 +4563,7 @@
 ﻿/*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2016/08/09 12:00
+* update:2016/12/23 15:23
 */
 (function () {
     "use strict";
@@ -4697,8 +4583,8 @@
 
             context = ops.context,
 
-            tabs = ops.tabs || $$(".tabTitle>li", context),
-            conts = ops.conts || $$(".tabCont>.turn-box", context);
+            tabs = ops.tabs || $$(".tab-title li.tab", context),
+            conts = ops.conts || $$(".tab-cont>.turn-box", context);
 
         self.tabs = tabs;
         self.conts = conts;

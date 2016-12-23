@@ -3,7 +3,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/04/09 15:54
+* update:2016/12/21 17:08
 */
 (function (undefined) {
     "use strict";
@@ -705,7 +705,7 @@
                 self.dr = setDrag(box, {
                     target: boxHead,
                     center: isCenter,
-                    shadow: ops.shadow !== false,
+                    shadow: ops.shadow,
                     autoMask: true,
 
                     //1.由于拖动会创建一个遮罩层,点击关闭时不会触发 .x-close 的click事件,此处检查点击元素,只有非 .x-close 元素才会执行拖动操作
