@@ -2,7 +2,7 @@
 /*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2016/12/23 15:23
+* update:2016/12/23 16:41
 */
 (function () {
     "use strict";
@@ -103,7 +103,9 @@
             self.index = index;
 
             //触发选项卡切换事件
-            async(window.onTabChange, 200, { index: index, tab: tab, cont: cont, loaded: map_loaded[index] });
+            var data = { index: index, tab: tab, cont: cont, loaded: map_loaded[index] };
+            async(self.onchange, 100, data);
+            async(window.onTabChange, 200, data);
             if (!map_loaded[index]) map_loaded[index] = true;
         }
     });

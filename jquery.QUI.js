@@ -1094,8 +1094,8 @@
         }
 
         if (level && size < stepNow) {
-            stepNow /= (isNum ? steps : steps.last());
             level--;
+            stepNow /= (isNum ? steps : steps[level]);
         }
 
         return { value: level ? size / stepNow : size, level: level };
@@ -2218,7 +2218,7 @@
 ﻿/*
 * Q.setTimer.js 计时器
 * author:devin87@qq.com
-* update:2015/06/11 09:50
+* update:2016/12/26 09:56
 */
 (function (undefined) {
     "use strict";
@@ -2228,6 +2228,7 @@
     //---------------------- 计时器 ----------------------
 
     //计时器
+    //ops: { box:".uptime",time:1566, pad:true, step:1, sleep:1000, join:"",units:["天", "时", "分", "秒"],process:function(total, text, days, hours, mintues, seconds){} }
     function setTimer(ops) {
         var box = ops.box,
             process = ops.process,
@@ -2264,7 +2265,7 @@
                 result = fire(process, undefined, total, text, days, hours, mintues, seconds);
 
             if (result !== false) {
-                if (box) box.innerHTML = typeof result == "string" ? result : text;
+                $(box).html(typeof result == "string" ? result : text);
                 timer = setTimeout(update, sleep);
             }
         };
@@ -2636,7 +2637,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/12/21 17:08
+* update:2016/12/27 14:51
 */
 (function (undefined) {
     "use strict";
@@ -3211,6 +3212,26 @@
 
     Box.alias("remove", "destroy");
 
+    //弹出层语言
+    var LANG_BOX = {
+        titleBox: "弹出框",
+        titleAlert: "提示信息",
+        titleConfirm: "确认信息",
+        titlePrompt: "输入信息",
+        titleClose: "点击关闭",
+        titleLoading: "加载数据",
+
+        buttonSubmit: "确定",
+        buttonCancel: "取消",
+
+        textLoading: "正在加载数据,请稍后…"
+    };
+
+    //配置弹出层
+    function setBoxLang(langs) {
+        extend(LANG_BOX, langs, true);
+    }
+
     //构造器:弹出层
     function WinBox(ops) {
         ops = ops || {};
@@ -3230,8 +3251,8 @@
 
             var html =
                 '<div class="x-head">' +
-                    '<h2 class="x-title">' + (ops.title || '弹出框') + '</h2>' +
-                    '<a class="x-close" title="点击关闭">X</a>' +
+                    '<h2 class="x-title">' + (ops.title || LANG_BOX.titleBox) + '</h2>' +
+                    '<a class="x-close" title="' + LANG_BOX.titleClose + '">X</a>' +
                 '</div>' +
                 '<div class="x-main">' +
                     '<div class="x-view">' +
@@ -3401,8 +3422,8 @@
 
             html =
                 '<div class="x-bottom">' +
-                    '<div class="' + buttonStyle + ' x-submit">确定</div>' +
-                    (mode == 2 ? '<div class="' + buttonStyle + ' x-cancel">取消</div>' : '') +
+                    '<div class="' + buttonStyle + ' x-submit">' + LANG_BOX.buttonSubmit + '</div>' +
+                    (mode == 2 ? '<div class="' + buttonStyle + ' x-cancel">' + LANG_BOX.buttonCancel + '</div>' : '') +
                 '</div>';
 
         return html;
@@ -3429,7 +3450,7 @@
 
         //提示框
         alert: function (msg, fn, ops) {
-            ops = get_dialog_ops("提示信息", msg, fn, ops);
+            ops = get_dialog_ops(LANG_BOX.titleAlert, msg, fn, ops);
             //ops.icon = 'images/Q/alert.gif';
             ops.iconHtml = '<div class="ico x-alert"></div>';
 
@@ -3437,7 +3458,7 @@
         },
         //确认框
         confirm: function (msg, fn, ops) {
-            ops = get_dialog_ops("确认信息", msg, fn, ops);
+            ops = get_dialog_ops(LANG_BOX.titleConfirm, msg, fn, ops);
             if (!ops.bottom) ops.bottom = get_bottom_html(2);
             ops.mask = ops.mask !== false;
 
@@ -3445,7 +3466,7 @@
             return box.bind(".x-submit", "click", "remove", true).bind(".x-cancel", "click", "remove", false);
         },
         prompt: function (msg, fn, ops) {
-            ops = get_dialog_ops("输入信息", undefined, fn, ops);
+            ops = get_dialog_ops(LANG_BOX.titlePrompt, undefined, fn, ops);
 
             var html =
                 '<div class="x-text">' + msg + '</div>' +
@@ -3482,8 +3503,8 @@
         showLoading: function (ops) {
             ops = extend({}, ops);
 
-            if (!ops.title) ops.title = "加载数据";
-            if (!ops.html) ops.html = "正在加载数据,请稍后…";
+            if (!ops.title) ops.title = LANG_BOX.titleLoading;
+            if (!ops.html) ops.html = LANG_BOX.textLoading;
             //ops.icon = 'images/Q/loading.gif';
             ops.iconHtml = '<div class="ico x-loading"></div>';
 
@@ -3500,6 +3521,7 @@
         maskSetup: maskSetup,
 
         setDrag: setDrag,
+        setBoxLang: setBoxLang,
 
         MaskBox: MaskBox,
         DragX: DragX,
@@ -4563,7 +4585,7 @@
 ﻿/*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2016/12/23 15:23
+* update:2016/12/23 16:41
 */
 (function () {
     "use strict";
@@ -4664,7 +4686,9 @@
             self.index = index;
 
             //触发选项卡切换事件
-            async(window.onTabChange, 200, { index: index, tab: tab, cont: cont, loaded: map_loaded[index] });
+            var data = { index: index, tab: tab, cont: cont, loaded: map_loaded[index] };
+            async(self.onchange, 100, data);
+            async(window.onTabChange, 200, data);
             if (!map_loaded[index]) map_loaded[index] = true;
         }
     });
