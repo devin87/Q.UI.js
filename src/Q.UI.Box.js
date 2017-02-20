@@ -3,7 +3,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/12/27 14:51
+* update:2017/01/20 10:14
 */
 (function (undefined) {
     "use strict";
@@ -699,7 +699,7 @@
             else if (isUNum(height)) self.setHeight(height);
 
             //遮罩层
-            if (ops.mask) self.mbox = ops.mask == "new" ? new MaskBox() : getMaskBox();
+            if (ops.mask !== false) self.mbox = ops.mask == "new" ? new MaskBox() : getMaskBox();
 
             var action_close = ops.close || "hide",
                 callback_close = self.getEventCallback(action_close);

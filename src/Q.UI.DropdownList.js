@@ -3,7 +3,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/03/09 13:09
+* update:2017/02/20 15:26
 */
 (function (undefined) {
     "use strict";
@@ -42,6 +42,8 @@
         self.box = ops.box;
         self.items = ops.items || [];
         self.multiple = ops.multiple;
+        self.canInput = ops.canInput;
+        self.textProp = ops.textProp || "text";
 
         //默认值或索引
         self.value = ops.value;
@@ -57,12 +59,15 @@
                 ops = self.ops,
                 box = self.box,
 
-                isDropdownList = !self.multiple;
+                isDropdownList = !self.multiple,
+                canInput = self.canInput;
 
             var html =
                 (isDropdownList ?
                 '<div class="x-sel-tag">' +
-                    '<div class="x-sel-text"></div>' +
+                    (canInput ?
+                    '<input type="text" class="x-sel-text" />' :
+                    '<div class="x-sel-text"></div>') +
                     '<div class="x-sel-arrow">' +
                         '<div class="arrow arrow-down"></div>' +
                     '</div>' +
@@ -85,7 +90,6 @@
 
                 self.elText = elText;
                 self.elArrow = elArrow;
-
             }
 
             self.elList = elList;
@@ -103,7 +107,7 @@
                     });
                 }
 
-                E.add(box, "mousedown", function (e) {
+                E.add(canInput ? elArrow : box, "mousedown", function (e) {
                     self.toggle();
 
                     return false;
@@ -306,7 +310,7 @@
             self.text = def(item.text, "");
             self.value = def(item.value, "");
 
-            if (self.elText) self.elText.innerHTML = self.text;
+            if (self.elText) self.elText[self.canInput ? "value" : "innerHTML"] = self[self.textProp];
 
             //多选框
             self.active(index);
@@ -331,6 +335,10 @@
         //自动切换显示或隐藏下拉列表
         toggle: function () {
             return this.elList.style.display == "none" ? this.show() : this.hide();
+        },
+        //获取当前项文本,当canInput为true时可调用此方法获取输入文本
+        getText: function () {
+            return this.canInput ? this.elText.value : this.text;
         }
     });
 

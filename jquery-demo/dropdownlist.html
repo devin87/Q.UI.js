@@ -37,13 +37,21 @@
                 </div>
                 <div class="sel1"></div>
 
-                <p class="info mt30">2. 多选框，支持Ctrl、Shift按键选择</p>
+
+                <p class="info">2. 下拉框 + 输入</p>
                 <div class="toolbar">
-                    <div class="inline-block w-button w-blue w-submit2">获取选中项的值</div>
-                    <div class="inline-block w-button w-green w-select2">选中4和5</div>
-                    <div class="inline-block w-button w-red w-clear2">清除选中项</div>
+                    <div class="inline-block w-button w-blue w-submit2">获取当前文本</div>
+                    <div class="inline-block w-button w-green w-select2">选中4</div>
                 </div>
                 <div class="sel2"></div>
+
+                <p class="info mt30">3. 多选框，支持Ctrl、Shift按键选择</p>
+                <div class="toolbar">
+                    <div class="inline-block w-button w-blue w-submit3">获取选中项的值</div>
+                    <div class="inline-block w-button w-green w-select3">选中4和5</div>
+                    <div class="inline-block w-button w-red w-clear3">清除选中项</div>
+                </div>
+                <div class="sel3"></div>
             </div>
 
             <div class="fl log"></div>
@@ -72,23 +80,32 @@
             value: 1
         });
 
-        //创建一个多选框
+        //创建一个下拉框(支持输入)
         var d2 = new Q.DropdownList({
             box: $$(".sel2")[0],
+            value: 1,
+            canInput: true
+        });
+
+        //创建一个多选框
+        var d3 = new Q.DropdownList({
+            box: $$(".sel3")[0],
             multiple: true,
             value: 2
         });
 
         d1.add("选择Web连接1", -1);
-        d2.add("选择Web连接2", -1);
+        d3.add("选择Web连接2", -1);
 
         for (var i = 1; i < 7; i++) {
-            d1.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 1 });
-            d2.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 1 });
+            d1.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 2 });
+            d2.add({ text: '选项' + i, value: i });
+            d3.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 3 });
         }
 
         d1.init();
         d2.init();
+        d3.init();
 
         d1.onchange = function (item, index) {
             /*
@@ -117,22 +134,36 @@
             d1.select(4);
         });
 
-        //--------------------- 多选框 ---------------------
+        //--------------------- 下拉框（支持输入） ---------------------
 
         //获取选中项的值
         $(".w-submit2").click(function () {
+            //d1.text   =>  选中项的文本
+            //d1.value  =>  选中项的值
+            writeLog('[下拉框] 当前文本：' + d2.getText());
+        });
+
+        //选中4
+        $(".w-select2").click(function () {
+            d2.select(4);
+        });
+
+        //--------------------- 多选框 ---------------------
+
+        //获取选中项的值
+        $(".w-submit3").click(function () {
             //d2.selectedItems => item数组
-            writeLog('[多选框] 已选择：' + d2.selectedItems.items("value"));
+            writeLog('[多选框] 已选择：' + d3.selectedItems.items("value"));
         });
 
         //清除选中项
-        $(".w-clear2").click(function () {
-            d2.clearSelect();
+        $(".w-clear3").click(function () {
+            d3.clearSelect();
         });
 
         //选中4和5
-        $(".w-select2").click(function () {
-            d2.select(4).select(5);
+        $(".w-select3").click(function () {
+            d3.select(4).select(5);
         });
 
 
