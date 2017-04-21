@@ -3,7 +3,7 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/10/16 10:26
+* update:2017/03/08 17:21
 */
 (function (undefined) {
     "use strict";
@@ -220,7 +220,7 @@
         //绘制UI
         draw: function (list) {
             this.drawNav();
-            this.ops.draw(list);
+            this.ops.draw.call(this, list);
 
             return this;
         }

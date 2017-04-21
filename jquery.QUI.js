@@ -1660,6 +1660,8 @@
     //解析url hash eg:#net/config!/wan  => {nav:"#net/config",param:"wan"}
     function parse_url_hash(hash) {
         if (!hash) hash = location.hash;
+        //可能对后续处理造成影响,比如 param 中有/等转码字符
+        //if(hash) hash = decode_url_param(hash);
 
         var nav = hash, param;
 
@@ -2462,11 +2464,12 @@
     }
 
     //将输入框样式设为错误模式
-    function setInputError(input, hasBorder) {
+    //value:重置后输入框的值,默认为空字符串
+    function setInputError(input, hasBorder, value) {
         if (hasBorder) input.style.borderColor = "red";
         else input.style.border = "1px solid red";
 
-        input.value = "";
+        input.value = value || "";
         input.focus();
     }
 
@@ -2639,7 +2642,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/01/20 10:14
+* update:2017/04/21 09:07
 */
 (function (undefined) {
     "use strict";
@@ -3469,6 +3472,8 @@
         },
         prompt: function (msg, fn, ops) {
             ops = get_dialog_ops(LANG_BOX.titlePrompt, undefined, fn, ops);
+            fn = ops.callback;
+            ops.callback = undefined;
 
             var html =
                 '<div class="x-text">' + msg + '</div>' +
@@ -4363,7 +4368,7 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/10/16 10:26
+* update:2017/03/08 17:21
 */
 (function (undefined) {
     "use strict";
@@ -4580,7 +4585,7 @@
         //绘制UI
         draw: function (list) {
             this.drawNav();
-            this.ops.draw(list);
+            this.ops.draw.call(this, list);
 
             return this;
         }

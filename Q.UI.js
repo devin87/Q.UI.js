@@ -2,7 +2,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/01/20 10:14
+* update:2017/04/21 09:07
 */
 (function (undefined) {
     "use strict";
@@ -832,6 +832,8 @@
         },
         prompt: function (msg, fn, ops) {
             ops = get_dialog_ops(LANG_BOX.titlePrompt, undefined, fn, ops);
+            fn = ops.callback;
+            ops.callback = undefined;
 
             var html =
                 '<div class="x-text">' + msg + '</div>' +
@@ -1726,7 +1728,7 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/10/16 10:26
+* update:2017/03/08 17:21
 */
 (function (undefined) {
     "use strict";
@@ -1943,7 +1945,7 @@
         //绘制UI
         draw: function (list) {
             this.drawNav();
-            this.ops.draw(list);
+            this.ops.draw.call(this, list);
 
             return this;
         }
