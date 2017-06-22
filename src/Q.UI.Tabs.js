@@ -2,7 +2,7 @@
 /*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2016/12/23 16:41
+* update:2017/04/21 21:29
 */
 (function () {
     "use strict";
@@ -22,8 +22,8 @@
 
             context = ops.context,
 
-            tabs = ops.tabs || $$(".tab-title li.tab", context),
-            conts = ops.conts || $$(".tab-cont>.turn-box", context);
+            tabs = ops.tabs || $$(".tab-title li.tab,.tabTitle>li", context),
+            conts = ops.conts || $$(".tab-cont>.turn-box,.tabCont>.turn-box", context);
 
         self.tabs = tabs;
         self.conts = conts;

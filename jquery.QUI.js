@@ -3,7 +3,7 @@
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
 * https://github.com/devin87/Q.js
 * author:devin87@qq.com  
-* update:2016/02/17 17:39
+* update:2017/06/22 14:26
 */
 (function (undefined) {
     "use strict";
@@ -931,7 +931,7 @@
                     ms;
 
                 if (index != -1) {
-                    ms = +ds.slice(index + 1);
+                    ms = +ds.slice(index + 1, index + 4);
                     ds = ds.slice(0, index);
                 }
 
@@ -2642,7 +2642,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/04/21 09:07
+* update:2017/05/26 15:16
 */
 (function (undefined) {
     "use strict";
@@ -3133,6 +3133,10 @@
         find: function (pattern, context) {
             return typeof pattern == "string" ? query(pattern, context || this.box) : makeArray(pattern);
         },
+        //在弹出框内查找对象
+        $: function (pattern, context) {
+            return $(this.find(pattern, context));
+        },
         //获取弹出框内查找到的第一个对象
         get: function (pattern, context) {
             return this.find(pattern, context)[0];
@@ -3215,7 +3219,10 @@
         }
     });
 
-    Box.alias("remove", "destroy");
+    Box.alias({
+        "$": "query",
+        "remove": "destroy"
+    });
 
     //弹出层语言
     var LANG_BOX = {
@@ -3246,7 +3253,7 @@
 
                 width = ops.width,
                 height = ops.height,
-                maxHeight = ops.maxHeight,
+                maxHeight = def(ops.maxHeight, view.getHeight() - 60),
                 isDrag = ops.drag !== false,
                 isCenter = isDrag && ops.center !== false,
                 className = ops.className;
@@ -4019,7 +4026,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/02/20 15:26
+* update:2017/05/04 11:34
 */
 (function (undefined) {
     "use strict";
@@ -4076,13 +4083,14 @@
                 box = self.box,
 
                 isDropdownList = !self.multiple,
-                canInput = self.canInput;
+                canInput = self.canInput,
+                placeholder = ops.placeholder;
 
             var html =
                 (isDropdownList ?
                 '<div class="x-sel-tag">' +
                     (canInput ?
-                    '<input type="text" class="x-sel-text" />' :
+                    '<input type="text" class="x-sel-text"' + (placeholder ? ' placeholder="' + placeholder + '"' : '') + ' />' :
                     '<div class="x-sel-text"></div>') +
                     '<div class="x-sel-arrow">' +
                         '<div class="arrow arrow-down"></div>' +
@@ -4368,7 +4376,7 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/03/08 17:21
+* update:2017/06/02 15:23
 */
 (function (undefined) {
     "use strict";
@@ -4435,7 +4443,7 @@
             var boxNav = ops.boxNav;
             if (boxNav) {
                 $(boxNav).on("click", "li", function () {
-                    self.go($(this).attr("x"), true);
+                    self.go($(this).attr("x"));
 
                     if (self.onclick) self.onclick.call(self, self.page);
                 });
@@ -4456,9 +4464,12 @@
 
             if (self.totalCount != undefined) self.totalPage = Math.ceil(self.totalCount / self.pageSize);
 
+            //重置页码
+            //self.page = undefined;
+
             return self;
         },
-        //设置数据列表(为传入ops.load)
+        //设置数据列表(用于ops.load)
         //data:数据列表
         setData: function (data) {
             if (data) {
@@ -4600,7 +4611,7 @@
 ﻿/*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2016/12/23 16:41
+* update:2017/04/21 21:29
 */
 (function () {
     "use strict";
@@ -4620,8 +4631,8 @@
 
             context = ops.context,
 
-            tabs = ops.tabs || $$(".tab-title li.tab", context),
-            conts = ops.conts || $$(".tab-cont>.turn-box", context);
+            tabs = ops.tabs || $$(".tab-title li.tab,.tabTitle>li", context),
+            conts = ops.conts || $$(".tab-cont>.turn-box,.tabCont>.turn-box", context);
 
         self.tabs = tabs;
         self.conts = conts;
