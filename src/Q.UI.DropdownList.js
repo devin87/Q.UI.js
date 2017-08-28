@@ -3,7 +3,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/02/20 15:26
+* update:2017/05/04 11:34
 */
 (function (undefined) {
     "use strict";
@@ -60,13 +60,14 @@
                 box = self.box,
 
                 isDropdownList = !self.multiple,
-                canInput = self.canInput;
+                canInput = self.canInput,
+                placeholder = ops.placeholder;
 
             var html =
                 (isDropdownList ?
                 '<div class="x-sel-tag">' +
                     (canInput ?
-                    '<input type="text" class="x-sel-text" />' :
+                    '<input type="text" class="x-sel-text"' + (placeholder ? ' placeholder="' + placeholder + '"' : '') + ' />' :
                     '<div class="x-sel-text"></div>') +
                     '<div class="x-sel-arrow">' +
                         '<div class="arrow arrow-down"></div>' +

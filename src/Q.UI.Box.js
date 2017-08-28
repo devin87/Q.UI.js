@@ -3,7 +3,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/01/20 10:14
+* update:2017/05/26 15:16
 */
 (function (undefined) {
     "use strict";
@@ -494,6 +494,10 @@
         find: function (pattern, context) {
             return typeof pattern == "string" ? query(pattern, context || this.box) : makeArray(pattern);
         },
+        //在弹出框内查找对象
+        $: function (pattern, context) {
+            return $(this.find(pattern, context));
+        },
         //获取弹出框内查找到的第一个对象
         get: function (pattern, context) {
             return this.find(pattern, context)[0];
@@ -576,7 +580,10 @@
         }
     });
 
-    Box.alias("remove", "destroy");
+    Box.alias({
+        "$": "query",
+        "remove": "destroy"
+    });
 
     //弹出层语言
     var LANG_BOX = {
@@ -607,7 +614,7 @@
 
                 width = ops.width,
                 height = ops.height,
-                maxHeight = ops.maxHeight,
+                maxHeight = def(ops.maxHeight, view.getHeight() - 60),
                 isDrag = ops.drag !== false,
                 isCenter = isDrag && ops.center !== false,
                 className = ops.className;
@@ -833,6 +840,8 @@
         },
         prompt: function (msg, fn, ops) {
             ops = get_dialog_ops(LANG_BOX.titlePrompt, undefined, fn, ops);
+            fn = ops.callback;
+            ops.callback = undefined;
 
             var html =
                 '<div class="x-text">' + msg + '</div>' +
