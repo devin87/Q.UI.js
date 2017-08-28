@@ -42,7 +42,7 @@
             boxNav: $(".pager"),   //页码显示区域
             showSize: true,        //是否显示记录条数
             //href: "",
-            page: request["page"] || +location.hash.slice(5),  //初始页码
+            page: request["page"] || +location.hash.slice(5) || 1,  //初始页码
 
             //自定义记录条数显示函数，需showSize为true
             //drawSize: function (self, html_page, html_count) { },

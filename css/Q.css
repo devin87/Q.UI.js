@@ -162,3 +162,8 @@ a.text { cursor: text; }
 .slide-box { position: relative; z-index: 1; overflow: hidden; }
 .slide-ul { width: 100%; height: 100%; position: relative; z-index: 1; }
 .slide-li { width: 100%; height: 100%; position: absolute; top: 0; z-index: 1; }
+
+/* --------------- 滑动条 --------------- */
+.range-slider-bar { width: 100%; background-color: #ccc; position: relative; }
+.range-progress { width: 0%; height: 4px; overflow: hidden; background-color: #2B85E9; }
+.range-slider { position: absolute; left: 0%; top: -6px; width: 16px; height: 16px; background-color: #2786f1; border-radius: 16px; }

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>图片无缝滚动</title>
+    <title>图片、内容无缝滚动</title>
     <link href="../css/Q.css" rel="stylesheet" type="text/css" />
     <link href="demo.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
@@ -18,7 +18,6 @@
         .slide-control { position: absolute; bottom: 10px; width: 100%; text-align: center; z-index: 20; }
         .slide-control a { display: inline-block; width: 40px; height: 5px; background: #828bc5; margin: 0 5px; }
         .slide-control .slide-on { background: #e05a00; }
-
 
         .slide2 .slide-box { width: 570px; height: 260px; }
         .slide2 .prev, .slide2 .next { color: green; margin-top: -56px; }
@@ -146,7 +145,7 @@
                 boxControl: ".slide-control",   //下方滚动按钮容器，可选
                 btnPrev: ".prev",               //向左滚动按钮
                 btnNext: ".next",               //向右滚动按钮
-                way: i == 2 ? "top" : "left",   //滚动方向，top:上下滚动，left:左右滚动，默认left
+                way: i == 2 ? "top" : "left",   //滚动方向，top:向上滚动，left:向左滚动，默认left
 
                 sleep: 5000,                    //自动滚动的时间间隔（ms）
 
