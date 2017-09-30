@@ -2095,7 +2095,7 @@
 * Q.UI.RangeSlider.js 滑动条(input[type=range])
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/08/25 11:14
+* update:2017/09/27 15:46
 */
 (function (undefined) {
     "use strict";
@@ -2164,7 +2164,7 @@
 
             //实现doDown接口
             base.doDown = function (e) {
-                totalWidth = elBar.offsetWidth
+                totalWidth = elBar.offsetWidth;
                 startWidth = elProgress.offsetWidth;
                 startX = e.clientX;
                 maxLeft = totalWidth - elSlider.offsetWidth;
@@ -2201,8 +2201,13 @@
             if (v < self.min) v = self.min;
             else if (v > self.max) v = self.max;
 
+            var elProgress = self._elProgress,
+                elSlider = self._elSlider,
+                totalWidth = self._elBar.offsetWidth;
+
             self.value = v;
-            self._elProgress.style.width = self._elSlider.style.left = (v * 100 / (self.max - self.min)) + '%';
+            elProgress.style.width = (v * 100 / (self.max - self.min)) + '%';
+            elSlider.style.left = (Math.min(elProgress.offsetWidth, totalWidth - elSlider.offsetWidth) * 100 / totalWidth) + '%';
 
             return self;
         }
