@@ -2,7 +2,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/05/26 15:16
+* update:2017/11/22 15:40
 */
 (function (undefined) {
     "use strict";
@@ -73,6 +73,8 @@
         this.box = box;
 
         this.set(extend(ops || {}, GLOBAL_MASK_SETTINGS));
+
+        this.count = isHidden(box) ? 0 : 1;
     }
 
     factory(MaskBox).extend({
@@ -98,12 +100,14 @@
             }
 
             cssShow(this.box);
+            this.count++;
 
             return this;
         },
         //隐藏遮罩层
         hide: function () {
-            cssHide(this.box);
+            if (this.count > 0) this.count--;
+            if (this.count <= 0) cssHide(this.box);
 
             return this;
         },
@@ -111,6 +115,7 @@
         remove: function () {
             removeEle(this.box);
             this.removed = true;
+            this.count = 0;
 
             return this;
         }
@@ -561,7 +566,7 @@
             removeEle(self.box);
 
             //遮罩层
-            if (self.mbox) self.mbox.remove();
+            if (self.mbox) self.mbox.hide();
 
             //拖动框
             if (self.dr) self.dr.destroy();
@@ -695,8 +700,23 @@
                 return self;
             };
 
+            //自动调整高度以适应maxHeight
+            self.autoHeight = function () {
+                var maxHeight = ops.maxHeight;
+                if (!maxHeight) return self;
+
+                var height_head = self.get(".x-head").offsetHeight,
+                   height_main = maxHeight - height_head - 20,
+                   max_height_main = maxHeight - height_head;
+
+                boxMain.style.height = boxMain.scrollHeight > max_height_main ? height_main + "px" : "auto";
+                if (isCenter) setCenter(box);
+
+                return self;
+            };
+
             //兼容性考虑,width最好指定固定值
-            if (isUNum(width)) setWidth(box, width);;
+            if (isUNum(width)) setWidth(box, width);
 
             if (boxHead.offsetWidth < 10) setWidth(boxHead, box.offsetWidth);
 
