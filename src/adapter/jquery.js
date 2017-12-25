@@ -3,7 +3,7 @@
 /*
 * Q.UI.adapter.jquery.js
 * author:devin87@qq.com  
-* update:2016/12/23 15:25
+* update:2017/12/25 13:44
 */
 (function (undefined) {
     "use strict";
@@ -157,6 +157,18 @@
         return el;
     }
 
+    //动态创建样式
+    function createStyle(cssText) {
+        var style = document.createElement("style");
+        style.type = "text/css";
+
+        style.styleSheet && (style.styleSheet.cssText = cssText) || style.appendChild(document.createTextNode(cssText));
+
+        Q.head.appendChild(style);
+
+        return style;
+    }
+
     //解析html为元素,默认返回第一个元素节点
     //all:是否返回所有节点(childNodes)
     function parseHTML(html, all) {
@@ -204,6 +216,8 @@
         }
         return all ? list : null;
     }
+
+    var DEF_OFFSET = { left: 0, top: 0 };
 
     extend(Q, {
         camelCase: $.camelCase,
@@ -281,16 +295,18 @@
         //},
 
         setCssIfNot: setCssIfNot,
-        setCenter: function (el) {
+        setCenter: function (el, onlyPos) {
             setCssIfNot(el, "position", "absolute");
 
             var size = view.getSize(),
-                offset = $(el.offsetParent).offset(),
+                offset = $(el.offsetParent).offset() || DEF_OFFSET,
 
-                left = Math.round((size.width - el.offsetWidth) / 2) - offset.left + view.getScrollLeft(),
-                top = Math.round((size.height - el.offsetHeight) / 2) - offset.top + view.getScrollTop();
+                left = Math.round((size.width - $(el).outerWidth()) / 2) - offset.left + view.getScrollLeft(),
+                top = Math.round((size.height - $(el).outerHeight()) / 2) - offset.top + view.getScrollTop(),
 
-            $(el).css({ left: Math.max(left, 0), top: Math.max(top, 0) });
+                pos = { left: Math.max(left, 0), top: Math.max(top, 0) };
+
+            return onlyPos ? pos : $(el).css(pos);
         },
 
         getFirst: function (el) {
@@ -317,6 +333,7 @@
             }
         },
         createEle: createEle,
+        createStyle: createStyle,
         parseHTML: parseHTML,
         removeEle: function (el) {
             $(el).remove();
