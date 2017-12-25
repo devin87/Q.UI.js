@@ -3,7 +3,7 @@
 
 具体使用参见demo
 
-###弹出框、确认框、输入框、加载框等
+### 弹出框、确认框、输入框、加载框等
 ```js
 /*ops : {
     title: "自定义标题",
@@ -35,7 +35,7 @@ Q.confirm('OK?',function(yes){
 })
 ```
 
-###下拉列表
+### 下拉列表
 ```js
 var dl = new Q.DropdownList({
 	box: element,
@@ -61,7 +61,7 @@ dl.value
 dl.selectedItems => []
 ```
 
-###右键菜单
+### 右键菜单
 ```js
 var data={
 	width: 180,           //菜单宽度
@@ -115,7 +115,7 @@ cm.destroy();
 */
 ```
 
-###颜色选择器
+### 颜色选择器
 ```js
 //颜色选择器对象
 var picker = new Q.ColorPicker;
@@ -125,13 +125,13 @@ picker.callback = function (color) {
 picker.show(e.clientX, e.clientY);
 ```
 
-###选项卡
+### 选项卡
 ```js
 //具体使用见demo
 Q.setTabs();
 ```
 
-###进度条
+### 进度条
 ```js
 var pgb = new Q.Progressbar({
     box: $$(".pg-bar")[0],
@@ -166,7 +166,7 @@ pgb.start();
 //pgb.set(speed, wait)
 ```
 
-###数据分页
+### 数据分页
 ```js
 var pager = new Q.DataPager({
     size: 10,              //页码数量
@@ -232,7 +232,7 @@ pager.onchange = function (page) {
 //pager.setData(data);
 ```
 
-###无缝滚动
+### 无缝滚动
 ```js
 new Q.Marquee({
     box: ".slide-box",              //顶层DOM对象，下列ul、boxControl等都基于此对象
