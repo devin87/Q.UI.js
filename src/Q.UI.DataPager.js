@@ -3,12 +3,25 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/06/02 15:23
+* update:2018/01/19 16:50
 */
 (function (undefined) {
     "use strict";
 
-    var factory = Q.factory;
+    var extend = Q.extend,
+        factory = Q.factory;
+
+    var LANG = {
+        prevPage: "&lt;上一页",
+        nextPage: "下一页&gt;",
+        pageSize: "每页{0}条",
+        totalCount: "共{0}条数据"
+    };
+
+    //配置语言
+    function setLang(langs) {
+        extend(LANG, langs, true);
+    }
 
     //---------------------- 数据分页 ----------------------
 
@@ -206,16 +219,16 @@
             var html =
                 '<div class="inline-block pager-bar' + (href ? ' pager-link' : '') + '">' +
                     '<ul>' +
-                        get_html_bar(Math.max(page - 1, 1), text.prev || '&lt;上一页', "prev") +
+                        get_html_bar(Math.max(page - 1, 1), text.prev || LANG.prevPage, "prev") +
                         list_bar.map(function (i) {
                             return get_html_bar(i, i || "…");
                         }).join('') +
-                        get_html_bar(Math.min(page + 1, totalPage), text.next || '下一页&gt;', "next") +
+                        get_html_bar(Math.min(page + 1, totalPage), text.next || LANG.nextPage, "next") +
                     '</ul>' +
                 '</div>' +
                 (ops.showSize !== false ?
                 '<div class="inline-block pager-count">' +
-                    draw_size(self, '每页<span class="page-size">' + pageSize + '</span>条', '共<span class="total-count">' + totalCount + '</span>条数据') +
+                    draw_size(self, LANG.pageSize.replace("{0}", '<span class="page-size">' + pageSize + '</span>'), LANG.totalCount.replace("{0}", '<span class="total-count">' + totalCount + '</span>')) +
                 '</div>' : '');
 
             $(boxNav).html(html);
@@ -231,6 +244,7 @@
 
     //------------------------- export -------------------------
 
-    Q.DataPager = DataPager;
+    DataPager.setLang = setLang;
 
+    Q.DataPager = DataPager;
 })();
