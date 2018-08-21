@@ -3,7 +3,7 @@
 * Q.UI.ColorPicker.js 颜色选择器
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2015/12/08 14:39
+* update:2018/06/13 11:12
 */
 (function (undefined) {
     "use strict";
@@ -26,6 +26,17 @@
 
         E = Q.event;
 
+    var LANG = {
+        cubic_color: "立方色",
+        series_color: "连续色调",
+        gray_color: "灰度等级"
+    };
+
+    //配置语言
+    function setLang(langs) {
+        extend(LANG, langs, true);
+    }
+
     var POS_VALUE_HIDDEN = -10000;
 
     //设置元素位置
@@ -36,47 +47,89 @@
 
     //---------------------- util ----------------------
 
-    var RE_RGB = /^rgb\((\d+),(\d+),(\d+)\)$/i,
-        RE_Hex = /^#?([0-9A-F]{3}|[0-9A-F]{6})$/i;
-
     //int值转为16进制颜色
-    function int2hex(n) {
-        return "#" + ("00000" + n.toString(16)).slice(-6);   //faster
-
-        //var str = ("00000" + n.toString(16)).slice(-6);
-        //return "#" + str.slice(4) + str.slice(2, 4) + str.slice(0, 2);
+    function int2hex(n, a) {
+        return "#" + (a ? Math.round(a * 255).toString(16) : "") + ("00000" + n.toString(16)).slice(-6);   //faster
     }
 
     //RGB颜色转为16进制颜色
-    function rgb2hex(r, g, b) {
-        return int2hex(r * 65536 + g * 256 + b);
-        //return int2hex(r + g * 256 + b * 65536);
+    function rgb2hex(r, g, b, a) {
+        return int2hex(r * 65536 + g * 256 + b * 1, a);
     }
 
-    //转为16进制颜色
-    function toHex(color) {
-        if (typeof color == "number") return int2hex(color);
+    //解析为rgba数组,若解析失败,则返回空数组 => [r,g,b,a]
+    //支持 #ffffff|#80ffffff|rgb(0,0,0)|rgba(0,0,0,0.5)
+    function parseColor(color) {
+        var rgba = [];
 
-        color = color.replace(/\s+/g, "");
-        if (!RE_RGB.test(color)) return color;
-
-        return rgb2hex(+RegExp.$1, +RegExp.$2, +RegExp.$3);
-    }
-
-    //转为RGB颜色
-    function toRGB(color) {
         if (typeof color == "number") color = int2hex(color);
-        if (!RE_Hex.test(color)) return color;
+        if (color.indexOf("#") == 0) {
+            var len = color.length;
+            if (len == 3 || len == 4) {
+                color = "#" + color.charAt(0) + color.charAt(0) + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2);
+                if (len == 4) color += color.charAt(3) + color.charAt(3);
+            }
 
-        color = RegExp.$1;
+            if (len == 9) {
+                rgba[3] = Math.round(parseInt(color.substr(1, 2), 16) * 100 / 255) / 100;
+                color = "#" + color.slice(3);
+            }
 
-        if (color.length == 3) {
-            var a = color.charAt(0), b = color.charAt(1), c = color.charAt(2);
-            color = a + a + b + b + c + c;
+            if (color.length == 7) {
+                rgba[0] = parseInt(color.substr(1, 2), 16);
+                rgba[1] = parseInt(color.substr(3, 2), 16);
+                rgba[2] = parseInt(color.substr(5, 2), 16);
+            }
+
+            return rgba;
         }
 
-        return "rgb(" + parseInt(color.substr(0, 2), 16) + "," + parseInt(color.substr(2, 2), 16) + "," + parseInt(color.substr(4, 2), 16) + ")";
+        color = color.replace(/\s+/g, "");
+        var start = color.indexOf('(');
+        if (start != -1) {
+            rgba = color.slice(start + 1, -1).split(',');
+        }
+
+        return rgba;
     }
+
+    //转为16进制颜色 eg: rgb(153,204,0) => #99CC00
+    function toHex(color) {
+        var rgba = parseColor(color);
+        if (rgba.length <= 0) return color;
+
+        return rgb2hex.apply(undefined, rgba.slice(0, 3));
+    }
+
+    //转为16进制颜色 eg: rgba(153,204,0,0.5) => #8099CC00
+    function toAHex(color) {
+        var rgba = parseColor(color);
+        if (rgba.length <= 0) return color;
+
+        return rgb2hex.apply(undefined, rgba);
+    }
+
+    //转为RGB颜色,转换失败则返回原颜色 eg: #99CC00 => rgba(153,204,0)
+    function toRGB(color) {
+        var rgba = parseColor(color);
+        if (rgba.length <= 0) return color;
+
+        return "rgb(" + rgba.slice(0, 3).join(",") + ")";
+    }
+
+    //转为RGBA颜色,转换失败则返回原颜色 eg: #8099CC00 => rgba(153,204,0,0.5)
+    function toRGBA(color) {
+        var rgba = parseColor(color);
+        if (rgba.length <= 0) return color;
+
+        return "rgba(" + rgba.join(",") + ")";
+    }
+
+    Q.parseColor = parseColor;
+    Q.toHex = toHex;
+    Q.toAHex = toAHex;
+    Q.toRGB = toRGB;
+    Q.toRGBA = toRGBA;
 
     //---------------------- ColorPicker ----------------------
 
@@ -104,9 +157,9 @@
                     '<div class="xp-val"></div>' +
                     '<div class="xp-type">' +
                         '<select>' +
-                            '<option value="Cube" selected="selected">立方色</option>' +
-                            '<option value="Series">连续色调</option>' +
-                            '<option value="Gray">灰度等级</option>' +
+                            '<option value="Cube" selected="selected">' + LANG.cubic_color + '</option>' +
+                            '<option value="Series">' + LANG.series_color + '</option>' +
+                            '<option value="Gray">' + LANG.gray_color + '</option>' +
                         '</select>' +
                     '</div>' +
                 '</div>' +
@@ -311,10 +364,10 @@
         }
     });
 
+    ColorPicker.setLang = setLang;
+
     //------------------------- export -------------------------
 
-    Q.toHex = toHex;
-    Q.toRGB = toRGB;
     Q.ColorPicker = ColorPicker;
 
 })();

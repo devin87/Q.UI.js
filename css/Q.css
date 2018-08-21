@@ -132,7 +132,7 @@ a.text { cursor: text; }
 .x-picker { position: absolute; width: 231px; border-style: solid; border-color: #000; border-width: 1px 0 0 1px; font-size: 12px; font-family: "宋体", Arial; z-index: 999; }
 .x-picker .xp-title { height: 25px; padding-top: 4px; background: #E4E4E4; border-style: solid; border-color: #000; border-width: 0 1px 1px 0; }
 .x-picker .xp-preview { float: left; width: 50px; height: 20px; border: 1px solid #333; background: #FFF; margin-left: 5px; display: inline; }
-.x-picker .xp-val { float: left; width: 80px; text-align: center; line-height: 20px; }
+.x-picker .xp-val { float: left; width: 60px; text-align: center; line-height: 20px; }
 .x-picker .xp-type { float: right; margin-right: 6px; display: inline; }
 .x-picker .xp-table table { table-layout: fixed; width: 0; height: 132px; border-collapse: collapse; cursor: default; }
 .x-picker .xp-table td { width: 10px; height: 10px; padding: 0; border-style: solid; border-color: #000; border-width: 0 1px 1px 0; }
@@ -167,3 +167,30 @@ a.text { cursor: text; }
 .range-slider-bar { width: 100%; background-color: #ccc; position: relative; }
 .range-progress { width: 0%; height: 4px; overflow: hidden; background-color: #2B85E9; }
 .range-slider { position: absolute; left: 0%; top: -6px; width: 16px; height: 16px; background-color: #2786f1; border-radius: 16px; }
+
+/* --------------- 音乐播放器 --------------- */
+.audio-player { position: absolute; right: 5px; bottom: 2px; z-index: 2; font-size: 12px; }
+.audio-list { background: #fff; padding: 10px; max-height: 460px; overflow-y: scroll; }
+.audio-controls { text-align: center; color: #fff; }
+.ac-inline { display: inline-block; vertical-align: top; }
+* html .ac-inline { display: inline; }
+* + html .ac-inline { display: inline; }
+.ac-btn, .ac-text { cursor: pointer; width: 30px; }
+.ac-btn, .ac-time, .ac-duration, .ac-text, .ac-scroll-box { background: #33b6a9; height: 28px; line-height: 28px; }
+.ac-songs, .ac-prev, .ac-duration, .ac-next, .ac-add { margin-right: 2px; }
+.ac-ico { background-image: url(../images/Q/player.png); background-repeat: no-repeat; background-size: 100px; width: 20px; height: 18px; margin: 6px auto 0; overflow: hidden; }
+.ac-songs .ac-ico { background-position: 1px -279px; }
+.ac-prev .ac-ico { background-position: 1px -22px; height: 17px; }
+.ac-play .ac-ico { background-position: 2px 0; height: 22px; margin-top: 4px; }
+.ac-pause .ac-ico { background-position: -20px 0; }
+.ac-next .ac-ico { background-position: 3px -39px; height: 17px; }
+.ac-play { }
+.ac-scroll-box { width: 50px; }
+.ac-text { font: bold 16px/28px arial; }
+.ac-add { font-size: 24px; display: none; }
+.ac-time { /*padding-left: 5px;*/ }
+.ac-duration { padding-right: 5px; }
+.audio-el { display: none; }
+
+/*.ac-btn, .ac-time, .ac-scroll-box, .ac-duration { background: #33b6a9; }*/
+.audio-list { border: 1px solid #33b6a9; }
