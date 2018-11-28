@@ -77,7 +77,8 @@
         //创建一个下拉框
         var d1 = new Q.DropdownList({
             box: $$(".sel1")[0],
-            value: 1
+            value: 1,
+            maxHeight: 200
         });
 
         //创建一个下拉框(支持输入)
@@ -97,15 +98,17 @@
         d1.add("选择Web连接1", -1);
         d3.add("选择Web连接2", -1);
 
-        for (var i = 1; i < 7; i++) {
+        for (var i = 1; i < 20; i++) {
             d1.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 2 });
             d2.add({ text: '选项' + i, value: i });
-            d3.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 3 });
+            if (i < 7) d3.add({ text: 'Sel Text <span class="hot">' + i + '</span>', value: i, disabled: i == 3 });
         }
 
         d1.init();
         d2.init();
         d3.init();
+
+        //d1.show();
 
         d1.onchange = function (item, index) {
             /*

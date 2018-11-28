@@ -3,7 +3,7 @@
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
 * https://github.com/devin87/Q.js
 * author:devin87@qq.com  
-* update:2018/10/10 16:14
+* update:2018/11/28 16:30
 */
 (function (undefined) {
     "use strict";
@@ -1259,7 +1259,7 @@
         var tmp = [];
 
         Object.forEach(obj, function (k, v) {
-            if (typeof v != "function") tmp.push(encode_url_param(k) + "=" + (v != undefined ? encode_url_param(v) : ""));
+            if (v != undefined && typeof v != "function") tmp.push(encode_url_param(k) + "=" + encode_url_param(v));
         });
 
         return tmp.join("&");
@@ -1291,7 +1291,12 @@
     function parse_url_params(search) {
         if (!search) return {};
 
-        if (search.charAt(0) == "?") search = search.slice(1);
+        var i = search.indexOf("?");
+        if (i != -1) search = search.slice(i + 1);
+
+        var j = search.indexOf("#");
+        if (j != -1) search = search.slice(0, j);
+
         if (!search) return {};
 
         var list = search.split("&"), map = {};
@@ -1323,11 +1328,11 @@
     function parse_url(url) {
         //return new URL(url);
 
-        var m = url.match(/(^[^:]*:)?\/\/([^:]+)(:\d+)?(\/[^?]+)?(\?[^#]*)?(#.*)?$/),
+        var m = url.match(/(^[^:]*:)?\/\/([^:\/]+)(:\d+)?(\/[^?]+)?(\?[^#]*)?(#.*)?$/),
             protocol = m[1] || DEF_LOC.protocol,
             hostname = m[2],
             port = (m[3] || "").slice(1),
-            host = hostname + ":" + port,
+            host = hostname + (port ? ":" + port : ""),
             pathname = m[4] || "/",
             search = m[5] || "",
             hash = m[6] || "";
@@ -4253,7 +4258,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/05/04 11:34
+* update:2018/11/28 19:10
 */
 (function (undefined) {
     "use strict";
@@ -4356,16 +4361,20 @@
                     E.add(document, "mousedown", function () {
                         self.hide();
                     });
+
+                    E.add(box, "mousedown", function (e) {
+                        E.stop(e, false, true);
+                    });
                 }
 
-                E.add(canInput ? elArrow : box, "mousedown", function (e) {
+                E.add(canInput ? elArrow : elTag, "mousedown", function (e) {
                     self.toggle();
 
                     return false;
                 });
 
                 listener_item = {
-                    mousedown: E.stop,
+                    //mousedown: E.stop,
                     mouseup: function (e) {
                         var index = this.x,
                             item = self.items[index];
@@ -4426,7 +4435,11 @@
 
             E.add(elList, listener_item, ".x-item");
 
-            return self.draw();
+            self.draw();
+
+            fire(self.oninit, self);
+
+            return self;
         },
         //绘制下拉视图
         draw: function () {
@@ -4459,8 +4472,10 @@
 
             if (maxHeight) {
                 var realHeight = elList.offsetHeight;
-                if (realHeight > maxHeight) elList.style.height = maxHeight;
+                if (realHeight > maxHeight) elList.style.height = maxHeight + "px";
             }
+
+            fire(self.ondraw, self);
 
             var value = self.value,
                 index = self.index;

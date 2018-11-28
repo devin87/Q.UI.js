@@ -1406,7 +1406,7 @@
 * Q.UI.DropdownList.js 下拉列表
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/05/04 11:34
+* update:2018/11/28 19:10
 */
 (function (undefined) {
     "use strict";
@@ -1509,16 +1509,20 @@
                     E.add(document, "mousedown", function () {
                         self.hide();
                     });
+
+                    E.add(box, "mousedown", function (e) {
+                        E.stop(e, false, true);
+                    });
                 }
 
-                E.add(canInput ? elArrow : box, "mousedown", function (e) {
+                E.add(canInput ? elArrow : elTag, "mousedown", function (e) {
                     self.toggle();
 
                     return false;
                 });
 
                 listener_item = {
-                    mousedown: E.stop,
+                    //mousedown: E.stop,
                     mouseup: function (e) {
                         var index = this.x,
                             item = self.items[index];
@@ -1579,7 +1583,11 @@
 
             E.add(elList, listener_item, ".x-item");
 
-            return self.draw();
+            self.draw();
+
+            fire(self.oninit, self);
+
+            return self;
         },
         //绘制下拉视图
         draw: function () {
@@ -1612,8 +1620,10 @@
 
             if (maxHeight) {
                 var realHeight = elList.offsetHeight;
-                if (realHeight > maxHeight) elList.style.height = maxHeight;
+                if (realHeight > maxHeight) elList.style.height = maxHeight + "px";
             }
+
+            fire(self.ondraw, self);
 
             var value = self.value,
                 index = self.index;
