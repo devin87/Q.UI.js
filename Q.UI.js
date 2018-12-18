@@ -1766,7 +1766,7 @@
 * Q.UI.DataPager.js 数据分页
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2018/01/19 16:50
+* update:2018/12/18 10:48
 */
 (function (undefined) {
     "use strict";
@@ -1855,7 +1855,7 @@
             ops.cache = ops.preload = false;
         }
 
-        self.set(ops.totalCount, ops.pageSize || 10).setData(ops.data).go(ops.page);
+        self.set(ops.totalCount, ops.pageSize || ops.pageCount || 10).setData(ops.data).go(ops.page);
     }
 
     factory(DataPager).extend({
@@ -1913,7 +1913,7 @@
                 list = data.data || [];
                 if (ops.cache) self.cache[page] = list;
 
-                self.set(data.totalCount, data.pageSize);
+                self.set(data.totalCount, data.pageSize || data.pageCount);
 
                 complete(list);
             });
