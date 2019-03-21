@@ -11,7 +11,7 @@ module.exports = {
 
         list: [
             {
-                src: ["Q.UI.Box.js", "Q.UI.ContextMenu.js", "Q.UI.DropdownList.js", "Q.UI.DataPager.js", "Q.UI.Tabs.js"/*, "Q.UI.ColorPicker.js", "Q.UI.Progressbar.js"*/, "Q.UI.RangeSlider.js"],
+                src: ["Q.UI.Box.js", "Q.UI.ContextMenu.js", "Q.UI.DropdownList.js", "Q.UI.DataPager.js", "Q.UI.Tabs.js", "Q.UI.Marquee.js"/*, "Q.UI.ColorPicker.js", "Q.UI.Progressbar.js"*/, "Q.UI.RangeSlider.js"],
                 dest: "/Q.UI.js"
             },
             {
