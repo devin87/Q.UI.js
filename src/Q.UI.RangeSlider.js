@@ -4,7 +4,7 @@
 * Q.UI.RangeSlider.js 滑动条(input[type=range])
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/09/27 15:46
+* update:2019/04/24 11:14
 */
 (function (undefined) {
     "use strict";
@@ -115,7 +115,7 @@
                 totalWidth = self._elBar.offsetWidth;
 
             self.value = v;
-            elProgress.style.width = (v * 100 / (self.max - self.min)) + '%';
+            elProgress.style.width = ((v - self.min) * 100 / (self.max - self.min)) + '%';
             elSlider.style.left = (Math.min(elProgress.offsetWidth, totalWidth - elSlider.offsetWidth) * 100 / totalWidth) + '%';
 
             return self;
