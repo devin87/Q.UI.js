@@ -3,7 +3,7 @@
 * Q.UI.Marquee.js 无缝滚动插件
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2016/08/01 13:51
+* update:2019/07/26 18:37
 */
 (function (undefined) {
     "use strict";
@@ -68,9 +68,11 @@
                 size = $lis.size(),
                 $controls;
 
-            //追加首尾元素，以实现无缝滚动
-            $ul.prepend($lis.last()[0].cloneNode(true));
-            $ul.append($lis.first()[0].cloneNode(true));
+            if (size > 0) {
+                //追加首尾元素，以实现无缝滚动
+                $ul.prepend($lis.last()[0].cloneNode(true));
+                $ul.append($lis.first()[0].cloneNode(true));
+            }
 
             if (size > 1) {
                 $control.html('<a></a>'.repeat(size));
