@@ -2,7 +2,7 @@
 /*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2017/04/21 21:29
+* update:2020/03/26 15:48
 */
 (function () {
     "use strict";
@@ -30,6 +30,8 @@
         self.map_loaded = {};
         self.map_index = {};
 
+        self.ops = ops;
+
         //扫描index和对应的hash
         tabs.forEach(function (el, i) {
             //优先显示
@@ -55,7 +57,7 @@
 
         //显示默认的选项卡
         setTimeout(function () {
-            var hash = parseHash().nav.slice(1) || ops.hash,
+            var hash = ops.hash || parseHash().nav.slice(1),
                 index = self.map_index[hash];
 
             if (index == undefined) index = ops.index || 0;
@@ -81,6 +83,7 @@
         //显示指定索引的选项卡
         showTab: function (index) {
             var self = this,
+                ops = self.ops,
                 lastIndex = self.index;
 
             if (index === lastIndex) return;
@@ -105,7 +108,7 @@
             //触发选项卡切换事件
             var data = { index: index, tab: tab, cont: cont, loaded: map_loaded[index] };
             async(self.onchange, 100, data);
-            async(window.onTabChange, 200, data);
+            if (ops.triggerTabChange !== false) async(window["onTabChange" + (ops.name ? "_" + ops.name : "")], 200, data);
             if (!map_loaded[index]) map_loaded[index] = true;
         }
     });

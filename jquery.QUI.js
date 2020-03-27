@@ -3,7 +3,7 @@
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
 * https://github.com/devin87/Q.js
 * author:devin87@qq.com  
-* update:2019/10/18 14:36
+* update:2019/11/29 18:37
 */
 (function (undefined) {
     "use strict";
@@ -122,7 +122,7 @@
      * @param {number|undefined} max_decimal_len 最大小数位数
      */
     function isNum(n, min, max, max_decimal_len) {
-        if (typeof n != "number") return false;
+        if (typeof n != "number" || isNaN(n)) return false;
 
         if (min != undefined && n < min) return false;
         if (max != undefined && n > max) return false;
@@ -1753,7 +1753,7 @@
 /*
 * Q.Queue.js 队列 for browser or Node.js
 * author:devin87@qq.com
-* update:2019/10/18 14:42
+* update:2020/01/07 18:48
 */
 (function (undefined) {
     "use strict";
@@ -2122,10 +2122,10 @@
      * 函数并行执行
      * @param {Array} tasks 任务数组
      * @param {function} complete 队列完成处理函数
-     * @param {object} ops 配置对象 eg: {tasks:[],count:10000,limitMode:1,auto:true,workerThread:1,timeout:0,inject:1,injectCallback:'complete',exec:function(task,next){},process:function(task,next){},processResult:function(tasks){}}
+     * @param {object} ops 配置对象 eg: {tasks:[],count:10000,limitMode:1,auto:true,workerThread:1,timeout:0,injectIndex:1,injectCallback:'complete',exec:function(task,next){},process:function(task,next){},processResult:function(tasks){}}
      * @param {number} workerThread 同时执行的任务数量
      */
-    function parallel(tasks, complete, ops) {
+    function parallel(tasks, complete, ops, workerThread) {
         return series(tasks, complete, ops, workerThread || (isArrayLike(tasks) ? tasks.length : Object.size(tasks)));
     }
 
@@ -2133,7 +2133,7 @@
 
     /**
      * ajax队列
-     * @param {object} ops 配置对象 eg: {tasks:[],count:10000,limitMode:1,auto:true,workerThread:1,timeout:0,inject:1,injectCallback:'complete',exec:function(task,next){},process:function(task,next){},processResult:function(tasks){}}
+     * @param {object} ops 配置对象 eg: {tasks:[],count:10000,limitMode:1,auto:true,workerThread:1,timeout:0,injectIndex:1,injectCallback:'complete',exec:function(task,next){},process:function(task,next){},processResult:function(tasks){}}
      */
     function ajaxQueue(ops) {
         ops = ops || {};
@@ -5179,7 +5179,7 @@
 ﻿/*
 * Q.UI.Tabs.js 选项卡插件
 * author:devin87@qq.com  
-* update:2017/04/21 21:29
+* update:2020/03/26 15:48
 */
 (function () {
     "use strict";
@@ -5207,6 +5207,8 @@
         self.map_loaded = {};
         self.map_index = {};
 
+        self.ops = ops;
+
         //扫描index和对应的hash
         tabs.forEach(function (el, i) {
             //优先显示
@@ -5232,7 +5234,7 @@
 
         //显示默认的选项卡
         setTimeout(function () {
-            var hash = parseHash().nav.slice(1) || ops.hash,
+            var hash = ops.hash || parseHash().nav.slice(1),
                 index = self.map_index[hash];
 
             if (index == undefined) index = ops.index || 0;
@@ -5258,6 +5260,7 @@
         //显示指定索引的选项卡
         showTab: function (index) {
             var self = this,
+                ops = self.ops,
                 lastIndex = self.index;
 
             if (index === lastIndex) return;
@@ -5282,7 +5285,7 @@
             //触发选项卡切换事件
             var data = { index: index, tab: tab, cont: cont, loaded: map_loaded[index] };
             async(self.onchange, 100, data);
-            async(window.onTabChange, 200, data);
+            if (ops.triggerTabChange !== false) async(window["onTabChange" + (ops.name ? "_" + ops.name : "")], 200, data);
             if (!map_loaded[index]) map_loaded[index] = true;
         }
     });
