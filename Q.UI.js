@@ -2342,20 +2342,24 @@
         //开始自动滚动
         start: function () {
             var self = this;
+            self.stop();
 
-            if (self.size > 1) {
-                self.timer = setTimeout(function () {
-                    self.playNext();
-                    self.start();
-                }, self.sleep);
-            }
+            if (self.size <= 1) return self;
+
+            self.timer = setTimeout(function () {
+                self.playNext();
+                self.start();
+            }, self.sleep);
 
             return self;
         },
         //停止自动滚动
         stop: function () {
             var self = this;
-            if (self.timer) clearTimeout(self.timer);
+            if (self.timer) {
+                clearTimeout(self.timer);
+                self.timer = undefined;
+            }
             return self;
         }
     });
