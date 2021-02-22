@@ -3,7 +3,7 @@
 * Q.UI.ColorPicker.js 颜色选择器
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2018/06/13 11:12
+* update:2020/11/20 15:04
 */
 (function (undefined) {
     "use strict";
@@ -65,12 +65,12 @@
         if (typeof color == "number") color = int2hex(color);
         if (color.indexOf("#") == 0) {
             var len = color.length;
-            if (len == 3 || len == 4) {
-                color = "#" + color.charAt(0) + color.charAt(0) + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2);
-                if (len == 4) color += color.charAt(3) + color.charAt(3);
+            if (len == 4 || len == 5) {
+                color = "#" + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2) + color.charAt(3) + color.charAt(3);
+                if (len == 5) color += color.charAt(4) + color.charAt(4);
             }
 
-            if (len == 9) {
+            if (color.length == 9) {
                 rgba[3] = Math.round(parseInt(color.substr(1, 2), 16) * 100 / 255) / 100;
                 color = "#" + color.slice(3);
             }

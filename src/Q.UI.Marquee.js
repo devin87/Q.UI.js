@@ -65,7 +65,7 @@
                 $lis = $ul.children(),
                 $control = self._$control,
 
-                size = $lis.size(),
+                size = $lis.length,
                 $controls;
 
             if (size > 0) {
