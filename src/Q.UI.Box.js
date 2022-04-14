@@ -3,7 +3,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/11/22 15:40
+* update:2022/04/14 11:10
 */
 (function (undefined) {
     "use strict";
@@ -58,6 +58,7 @@
 
         view = Q.view,
 
+        Listener = Q.Listener,
         E = Q.event;
 
     //------------------------- Mask -------------------------
@@ -487,11 +488,15 @@
 
     //------------------------- Box -------------------------
 
+    //Box全局事件处理
+    var listener_box = new Listener(["init", "show", "hide", "remove"]);
+
     //接口,构造器:Box对象
     function Box(init) {
         this._es = [];
 
         fire(init, this);
+        listener_box.trigger("init", [this]);
     }
 
     factory(Box).extend({
@@ -543,6 +548,8 @@
             cssShow(self.box);
             if (self.mbox) self.mbox.show();
 
+            listener_box.trigger("show", [self]);
+
             return self;
         },
         //隐藏
@@ -552,6 +559,8 @@
             cssHide(self.box);
             if (self.mbox) self.mbox.hide();
             if (self.onHide) self.onHide();
+
+            listener_box.trigger("hide", [self]);
 
             return self.fire();
         },
@@ -581,6 +590,8 @@
 
             if (self.onRemove) self.onRemove();
 
+            listener_box.trigger("remove", [self]);
+
             return self.fire();
         }
     });
@@ -589,6 +600,12 @@
         "$": "query",
         "remove": "destroy"
     });
+
+    //添加全局事件 type: init、show、hide、remove
+    Box.on = function (type, fn) {
+        listener_box.add(type, fn);
+        return Box;
+    };
 
     //弹出层语言
     var LANG_BOX = {

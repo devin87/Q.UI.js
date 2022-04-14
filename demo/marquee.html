@@ -53,19 +53,19 @@
                         <li class="slide-li">
                             <ul>
                                 <li>
-                                    <div class="img"><img src="https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2591289975.jpg" /></div>
+                                    <div class="img"><img src="images/p2591289975.jpg" /></div>
                                     <div class="name">灰猎犬号</div>
                                 </li>
                                 <li>
-                                    <div class="img"><img src="https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2603657253.jpg" /></div>
+                                    <div class="img"><img src="images/p2591289975.jpg" /></div>
                                     <div class="name">永生守卫</div>
                                 </li>
                                 <li>
-                                    <div class="img"><img src="https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2568341795.jpg" /></div>
+                                    <div class="img"><img src="images/p2591289975.jpg" /></div>
                                     <div class="name">下半场</div>
                                 </li>
                                 <li class="last">
-                                    <div class="img"><img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2570353329.jpg" /></div>
+                                    <div class="img"><img src="images/p2591289975.jpg" /></div>
                                     <div class="name">最后一封信</div>
                                 </li>
                             </ul>
@@ -73,19 +73,19 @@
                         <li class="slide-li">
                             <ul>
                                 <li>
-                                    <div class="img"><img src="https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2608495324.jpg" /></div>
+                                    <div class="img"><img src="images/p2608495324.jpg" /></div>
                                     <div class="name">侵入者</div>
                                 </li>
                                 <li>
-                                    <div class="img"><img src="https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2604993774.jpg" /></div>
+                                    <div class="img"><img src="images/p2608495324.jpg" /></div>
                                     <div class="name">咱们裸熊：电影版</div>
                                 </li>
                                 <li>
-                                    <div class="img"><img src="https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2611124274.jpg" /></div>
+                                    <div class="img"><img src="images/p2608495324.jpg" /></div>
                                     <div class="name">猎谎者</div>
                                 </li>
                                 <li class="last">
-                                    <div class="img"><img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2559277527.jpg" /></div>
+                                    <div class="img"><img src="images/p2608495324.jpg" /></div>
                                     <div class="name">战争幽灵</div>
                                 </li>
                             </ul>
@@ -93,11 +93,11 @@
                         <li class="slide-li">
                             <ul>
                                 <li>
-                                    <div class="img"><img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2574172427.jpg" /></div>
+                                    <div class="img"><img src="images/p2574172427.jpg" /></div>
                                     <div class="name">利刃出鞘</div>
                                 </li>
                                 <li>
-                                    <div class="img"><img src="https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2570235120.jpg" /></div>
+                                    <div class="img"><img src="images/p2574172427.jpg" /></div>
                                     <div class="name">阳光普照</div>
                                 </li>
                             </ul>
@@ -150,7 +150,16 @@
                 isSlideKeydown: true,           //是否允许键盘（左右方向键）控制滚动，默认为true
                 isStoppedHover: true,           //鼠标移上去时停止自动滚动，移出时开始自动滚动，默认为true
 
-                auto: true                      //是否自动滚动
+                auto: true,                     //是否自动滚动
+
+                on: {
+                    beforeSlide: function (i, el) {
+
+                    },
+                    slide: function (i, el) {
+                        
+                    }
+                }
             });
         });
     </script>

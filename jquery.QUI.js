@@ -3,7 +3,7 @@
 * Q.js (包括 通用方法、原生对象扩展 等) for browser or Node.js
 * https://github.com/devin87/Q.js
 * author:devin87@qq.com  
-* update:2021/04/15 15:39
+* update:2022/04/14 11:10
 */
 (function (undefined) {
     "use strict";
@@ -459,6 +459,7 @@
      */
     function getChangedData(target, source, skipProps, skipPrefix) {
         if (!target) return undefined;
+        if (!source) return target;
 
         var map_skip_prop = skipProps ? toMap(skipProps, true) : {},
             data_changed = {},
@@ -1274,7 +1275,11 @@
             var map = this.map;
 
             if (typeof type == "string") {
-                if (isFunc(fn)) map[type].push(fn);
+                if (isFunc(fn)) {
+                    (type + "").split(",").forEach(function (type) {
+                        map[type].push(fn);
+                    });
+                }
             } else if (isObject(type)) {
                 Object.forEach(type, function (k, v) {
                     if (map[k] && isFunc(v)) map[k].push(v);
@@ -1439,6 +1444,22 @@
     }
 
     /**
+     * 格式化访问地址 eg: 192.168.1.50 => http://192.168.1.50/
+     * @param {string} host IP或访问地址 eg: 192.168.1.50 | http://192.168.1.50
+     */
+    function formatHost(host) {
+        if (!host) return '';
+
+        host = (host + '').trim();
+        if (!host) return '';
+
+        if (!Q.isHttpURL(host)) host = 'http://' + host;
+        if (!host.endsWith('/')) host += '/';
+
+        return host;
+    }
+
+    /**
      * 按照进制解析数字的层级 eg:时间转化 -> parseLevel(86400,[60,60,24]) => { value=1, level=3 }
      * @param {number} size 要解析的数字
      * @param {number|Array.<number>} steps 步进,可以是固定的数字(eg:1024),也可以是具有层次关系的数组(eg:[60,60,24])
@@ -1494,13 +1515,13 @@
         return ops.all ? pl : pl.text;
     }
 
-    var encode_url_param = encodeURIComponent;
+    var encodeUrlParam = encodeURIComponent;
 
     /**
      * 解码url参数值 eg:%E6%B5%8B%E8%AF%95 => 测试
      * @param {string} param 要解码的字符串 eg:%E6%B5%8B%E8%AF%95
      */
-    function decode_url_param(param) {
+    function decodeUrlParam(param) {
         try {
             return decodeURIComponent(param);
         } catch (e) {
@@ -1512,14 +1533,14 @@
      * 将参数对象转为查询字符串 eg: {a:1,b:2} => a=1&b=2
      * @param {object} obj 参数对象 eg: {a:1,b:2}
      */
-    function to_param_str(obj) {
+    function joinUrlParams(obj) {
         if (!obj) return "";
         if (typeof obj == "string") return obj;
 
         var tmp = [];
 
         Object.forEach(obj, function (k, v) {
-            if (v != undefined && typeof v != "function") tmp.push(encode_url_param(k) + "=" + encode_url_param(v));
+            if (v != undefined && typeof v != "function") tmp.push(encodeUrlParam(k) + "=" + encodeUrlParam(v));
         });
 
         return tmp.join("&");
@@ -1529,11 +1550,11 @@
      * 连接url和查询字符串(支持传入对象)
      * @param {string} url URL地址
      */
-    function join_url(url) {
+    function joinUrl(url) {
         var params = [], args = arguments;
         for (var i = 1, len = args.length; i < len; i++) {
             var param = args[i];
-            if (param) params.push(to_param_str(param));
+            if (param) params.push(joinUrlParams(param));
         }
 
         var index = url.indexOf("#"), hash = "";
@@ -1554,7 +1575,7 @@
      * 解析url参数 eg:url?id=1
      * @param {string} search 查询字符串 eg: ?id=1
      */
-    function parse_url_params(search) {
+    function parseUrlParams(search) {
         if (!search) return {};
 
         var i = search.indexOf("?");
@@ -1575,7 +1596,7 @@
                 key = kv[0],
                 value = kv[1];
 
-            if (key) map[decode_url_param(key)] = value ? decode_url_param(value) : "";
+            if (key) map[decodeUrlParam(key)] = value ? decodeUrlParam(value) : "";
         }
 
         return map;
@@ -1585,10 +1606,10 @@
      * 转换或解析查询字符串
      * @param {string|object} obj 为string类型时将解析为参数对象，否则将转换为查询字符串
      */
-    function process_url_param(obj) {
+    function processUrlParam(obj) {
         if (obj == undefined) return;
 
-        return typeof obj == "string" ? parse_url_params(obj) : to_param_str(obj);
+        return typeof obj == "string" ? parseUrlParams(obj) : joinUrlParams(obj);
     }
 
     var DEF_LOC = GLOBAL.location || { protocol: "", hash: "", pathname: "" };
@@ -1597,7 +1618,7 @@
      * 解析URL路径 => {href,origin,protocol,host,hostname,port,pathname,search,hash}
      * @param {string} url URL地址
      */
-    function parse_url(url) {
+    function parseUrl(url) {
         //return new URL(url);
 
         var m = url.match(/(^[^:]*:)?\/\/([^:\/]+)(:\d+)?(.*)$/),
@@ -1630,7 +1651,7 @@
      * 解析 URL hash值 eg:#net/config!/wan  => {nav:"#net/config",param:"wan"}
      * @param {string} hash eg:#net/config!/wan
      */
-    function parse_url_hash(hash) {
+    function parseUrlHash(hash) {
         if (!hash) hash = DEF_LOC.hash;
         //可能对后续处理造成影响,比如 param 中有/等转码字符
         //if(hash) hash = decode_url_param(hash);
@@ -1653,7 +1674,7 @@
      * @param {string} path eg: /app.html?id=1#aa
      * @param {boolean} keepQueryHash 是否保留查询字符串和Hash字符串,默认为false
      */
-    function get_page_name(path, keepQueryHash) {
+    function getPageName(path, keepQueryHash) {
         var pathname = (path || DEF_LOC.pathname).replace(/\\/g, "/"),
             start = pathname.lastIndexOf("/") + 1;
 
@@ -1663,6 +1684,18 @@
         if (end == -1) end = pathname.indexOf("#", start);
 
         return end != -1 ? pathname.slice(start, end) : pathname.slice(start);
+    }
+
+    /**
+     * 解析JSON，解析失败时返回undefined
+     * @param {string} text 要解析的JSON字符串
+     */
+    function parseJSON(text) {
+        if (!text || typeof text !== 'string') return text;
+
+        try {
+            return JSON.parse(text);
+        } catch (err) { }
     }
 
     //---------------------- export ----------------------
@@ -1730,17 +1763,21 @@
         isMAC: isMAC,
         isHttpURL: isHttpURL,
 
+        formatHost: formatHost,
+
         parseLevel: parseLevel,
         formatSize: formatSize,
 
-        parseUrlParams: parse_url_params,
-        joinUrlParams: to_param_str,
-        param: process_url_param,
-        join: join_url,
+        parseUrlParams: parseUrlParams,
+        joinUrlParams: joinUrlParams,
+        param: processUrlParam,
+        join: joinUrl,
 
-        parseUrl: parse_url,
-        parseHash: parse_url_hash,
-        getPageName: get_page_name,
+        parseUrl: parseUrl,
+        parseHash: parseUrlHash,
+        getPageName: getPageName,
+
+        parseJSON: parseJSON,
 
         Listener: Listener,
         SE: SE
@@ -2166,7 +2203,7 @@
 /*
 * Q.core.js (包括 通用方法、JSON、Cookie、Storage 等) for browser
 * author:devin87@qq.com  
-* update:2020/06/05 19:30
+* update:2021/09/24 10:58
 */
 (function (undefined) {
     "use strict";
@@ -3173,7 +3210,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/11/22 15:40
+* update:2022/04/14 11:10
 */
 (function (undefined) {
     "use strict";
@@ -3228,6 +3265,7 @@
 
         view = Q.view,
 
+        Listener = Q.Listener,
         E = Q.event;
 
     //------------------------- Mask -------------------------
@@ -3657,11 +3695,15 @@
 
     //------------------------- Box -------------------------
 
+    //Box全局事件处理
+    var listener_box = new Listener(["init", "show", "hide", "remove"]);
+
     //接口,构造器:Box对象
     function Box(init) {
         this._es = [];
 
         fire(init, this);
+        listener_box.trigger("init", [this]);
     }
 
     factory(Box).extend({
@@ -3713,6 +3755,8 @@
             cssShow(self.box);
             if (self.mbox) self.mbox.show();
 
+            listener_box.trigger("show", [self]);
+
             return self;
         },
         //隐藏
@@ -3722,6 +3766,8 @@
             cssHide(self.box);
             if (self.mbox) self.mbox.hide();
             if (self.onHide) self.onHide();
+
+            listener_box.trigger("hide", [self]);
 
             return self.fire();
         },
@@ -3751,6 +3797,8 @@
 
             if (self.onRemove) self.onRemove();
 
+            listener_box.trigger("remove", [self]);
+
             return self.fire();
         }
     });
@@ -3759,6 +3807,12 @@
         "$": "query",
         "remove": "destroy"
     });
+
+    //添加全局事件 type: init、show、hide、remove
+    Box.on = function (type, fn) {
+        listener_box.add(type, fn);
+        return Box;
+    };
 
     //弹出层语言
     var LANG_BOX = {
@@ -5313,7 +5367,7 @@
 * Q.UI.Marquee.js 无缝滚动插件
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2019/07/26 18:37
+* update:2022/02/14 17:01
 */
 (function (undefined) {
     "use strict";
@@ -5359,8 +5413,10 @@
         self.isSlideKeydown = ops.isSlideKeydown !== false;
         self.isStoppedHover = ops.isStoppedHover !== false;
 
-        self.clsActive = "slide-on";
+        self.clsActive = ops.clsActive || "slide-on";
         self.index = 0;
+
+        self.fns = ops.on || {};
 
         self.init();
     }
@@ -5369,6 +5425,7 @@
         //初始化
         init: function () {
             var self = this,
+                fns = self.fns,
                 $box = self._$box,
 
                 $ul = self._$ul,
@@ -5407,10 +5464,13 @@
             self._cssBox = $box.prop("className");
             self.size = size;
 
-            $lis.eq(1).addClass(self.clsActive);
+            var el = $lis.get(1);
+            $(el).addClass(self.clsActive);
             self.updateControl(0);
 
-            if (self.auto) self.start();
+            fire(fns.init, self, 0, el);
+
+            self.start();
 
             return self.initEvent();
         },
@@ -5469,6 +5529,7 @@
         //无缝滚动（-1<=i<=size）
         play: function (i) {
             var self = this,
+                fns = self.fns,
                 clsActive = self.clsActive,
                 $ul = self._$ul,
                 $lis = self._$lis,
@@ -5476,13 +5537,19 @@
 
             if (size <= 1) return self;
 
+            self.stop();
+
             var i_valid = i;
             if (i_valid >= size) i_valid = 0;
             else if (i_valid < 0) i_valid = size - 1;
 
-            $lis.removeClass(clsActive).eq(i + 1).addClass(clsActive);
+            var el = $lis.get(i + 1);
+
+            $lis.removeClass(clsActive);
+            $(el).addClass(clsActive);
             self.updateControl(i_valid);
 
+            fire(fns.beforeSlide, self, i_valid, el);
             fire(self.onPlay, self, i_valid);
 
             var params = {};
@@ -5496,6 +5563,10 @@
 
                     fire(self.onPlayed, self, i_valid);
                 }
+
+                fire(fns.slide, self, i_valid, el);
+
+                self.start();
             });
 
             self.index = i;
@@ -5515,11 +5586,10 @@
             var self = this;
             self.stop();
 
-            if (self.size <= 1) return self;
+            if (!self.auto || self.size <= 1) return self;
 
             self.timer = setTimeout(function () {
                 self.playNext();
-                self.start();
             }, self.sleep);
 
             return self;

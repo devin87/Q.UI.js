@@ -2,7 +2,7 @@
 * Q.UI.Box.js (包括遮罩层、拖动、弹出框)
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2017/11/22 15:40
+* update:2022/04/14 11:10
 */
 (function (undefined) {
     "use strict";
@@ -57,6 +57,7 @@
 
         view = Q.view,
 
+        Listener = Q.Listener,
         E = Q.event;
 
     //------------------------- Mask -------------------------
@@ -486,11 +487,15 @@
 
     //------------------------- Box -------------------------
 
+    //Box全局事件处理
+    var listener_box = new Listener(["init", "show", "hide", "remove"]);
+
     //接口,构造器:Box对象
     function Box(init) {
         this._es = [];
 
         fire(init, this);
+        listener_box.trigger("init", [this]);
     }
 
     factory(Box).extend({
@@ -542,6 +547,8 @@
             cssShow(self.box);
             if (self.mbox) self.mbox.show();
 
+            listener_box.trigger("show", [self]);
+
             return self;
         },
         //隐藏
@@ -551,6 +558,8 @@
             cssHide(self.box);
             if (self.mbox) self.mbox.hide();
             if (self.onHide) self.onHide();
+
+            listener_box.trigger("hide", [self]);
 
             return self.fire();
         },
@@ -580,6 +589,8 @@
 
             if (self.onRemove) self.onRemove();
 
+            listener_box.trigger("remove", [self]);
+
             return self.fire();
         }
     });
@@ -588,6 +599,12 @@
         "$": "query",
         "remove": "destroy"
     });
+
+    //添加全局事件 type: init、show、hide、remove
+    Box.on = function (type, fn) {
+        listener_box.add(type, fn);
+        return Box;
+    };
 
     //弹出层语言
     var LANG_BOX = {
@@ -2142,7 +2159,7 @@
 * Q.UI.Marquee.js 无缝滚动插件
 * https://github.com/devin87/Q.UI.js
 * author:devin87@qq.com
-* update:2019/07/26 18:37
+* update:2022/02/14 17:01
 */
 (function (undefined) {
     "use strict";
@@ -2188,8 +2205,10 @@
         self.isSlideKeydown = ops.isSlideKeydown !== false;
         self.isStoppedHover = ops.isStoppedHover !== false;
 
-        self.clsActive = "slide-on";
+        self.clsActive = ops.clsActive || "slide-on";
         self.index = 0;
+
+        self.fns = ops.on || {};
 
         self.init();
     }
@@ -2198,6 +2217,7 @@
         //初始化
         init: function () {
             var self = this,
+                fns = self.fns,
                 $box = self._$box,
 
                 $ul = self._$ul,
@@ -2236,10 +2256,13 @@
             self._cssBox = $box.prop("className");
             self.size = size;
 
-            $lis.eq(1).addClass(self.clsActive);
+            var el = $lis.get(1);
+            $(el).addClass(self.clsActive);
             self.updateControl(0);
 
-            if (self.auto) self.start();
+            fire(fns.init, self, 0, el);
+
+            self.start();
 
             return self.initEvent();
         },
@@ -2298,6 +2321,7 @@
         //无缝滚动（-1<=i<=size）
         play: function (i) {
             var self = this,
+                fns = self.fns,
                 clsActive = self.clsActive,
                 $ul = self._$ul,
                 $lis = self._$lis,
@@ -2305,13 +2329,19 @@
 
             if (size <= 1) return self;
 
+            self.stop();
+
             var i_valid = i;
             if (i_valid >= size) i_valid = 0;
             else if (i_valid < 0) i_valid = size - 1;
 
-            $lis.removeClass(clsActive).eq(i + 1).addClass(clsActive);
+            var el = $lis.get(i + 1);
+
+            $lis.removeClass(clsActive);
+            $(el).addClass(clsActive);
             self.updateControl(i_valid);
 
+            fire(fns.beforeSlide, self, i_valid, el);
             fire(self.onPlay, self, i_valid);
 
             var params = {};
@@ -2325,6 +2355,10 @@
 
                     fire(self.onPlayed, self, i_valid);
                 }
+
+                fire(fns.slide, self, i_valid, el);
+
+                self.start();
             });
 
             self.index = i;
@@ -2344,11 +2378,10 @@
             var self = this;
             self.stop();
 
-            if (self.size <= 1) return self;
+            if (!self.auto || self.size <= 1) return self;
 
             self.timer = setTimeout(function () {
                 self.playNext();
-                self.start();
             }, self.sleep);
 
             return self;

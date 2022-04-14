@@ -60,7 +60,7 @@ a.text { cursor: text; }
 .x-drag-shadow { position: absolute; left: 0; top: 0; background-color: #f1f1f1; cursor: move; display: none; z-index: 999999; }
 
 /*------------弹出层--------------*/
-.x-box { position: absolute; background: #fff; border: 1px solid #ccc; z-index: 1000; color: #666; }
+.x-box { position: absolute; background: #fff; border: 1px solid #ccc; z-index: 1000; color: #666; max-width: 100%; }
 .x-box .x-head { position: relative; background-color: #f6f6f6; height: 32px; line-height: 32px; border-bottom: 1px solid #ddd; }
 .x-head .x-title { position: absolute; left: 0; background: url(../images/Q/ico.gif) 5px 12px no-repeat; padding-left: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; color: #336699; }
 .x-head .x-close { position: absolute; right: 6px; cursor: pointer; width: 24px; text-align: center; font: bold 14px/32px verdana,Arial; color: #336699; }
